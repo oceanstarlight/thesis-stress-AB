@@ -8,14 +8,16 @@ Steps, all deterministic except the one extraction call:
    reported and impairment-adjusted EBITDA. Thresholds: user input, else default rule; a
    disclosed covenant is computed as its own labeled scenario because its definition rarely
    matches the indicator computed here.
-4. Assumptions written to a ledger for Watch and Audit.
+4. Counter-evidence: indicator rules, one-year trends, recent 8-Ks and stress-related filing
+   text that argue against a comfortable conclusion (``counter``).
+5. Assumptions written to a ledger for Watch and Audit.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from riskprobe import config, extract, indicators, pit, quality, reverse, text
+from riskprobe import config, counter, events, extract, indicators, pit, quality, reverse, text
 from riskprobe.ledger import Assumption, Ledger, Threshold
 from riskprobe.models import Evidence, Unknown
 from riskprobe.sources.sec import Filing, SecSource
@@ -42,6 +44,7 @@ class ProbeResult:
     filing: Filing | None = None
     extraction: extract.ExtractionResult | None = None
     scenarios: list[Scenario] = field(default_factory=list)
+    counters: list[counter.Counter] = field(default_factory=list)
     ledger: Ledger | None = None
     unknowns: list[Unknown] = field(default_factory=list)
 
@@ -154,6 +157,11 @@ def run(query: str, as_of: str, http, user: dict | None = None) -> ProbeResult:
             out.scenarios.append(Scenario(r, basis, label, list(float_notes)))
         for th, label in thresholds("net_debt_to_ebitda"):
             out.scenarios.append(Scenario(reverse.ebitda_drop_to_leverage(nd, e.value, th), basis, label, list(debt_note)))
+
+    prev = indicators.compute(book, indicators._one_year_before(end))
+    recent, ev_unknowns = events.scan(src, data.filings, indicators._one_year_before(as_of), as_of)
+    out.unknowns += ev_unknowns
+    out.counters = counter.find(book, out.indicators, prev, recent, out.extraction)
 
     out.ledger = _ledger(out, query, as_of)
     return out

@@ -65,3 +65,12 @@ LLM_CACHE = os.environ.get("RISKPROBE_LLM_CACHE", "1") != "0"
 LLM_CACHE_DIR = Path(os.environ.get("RISKPROBE_LLM_CACHE_DIR", DATA_DIR / "llm_cache"))
 # Filing text sent to the model: keyword-selected paragraphs up to this many characters.
 EXTRACT_MAX_CHARS = 120_000
+# Probe counter-evidence rules (riskprobe/counter.py). Conventions, shown as "기본 규칙".
+COUNTER_RULES = {
+    "ocf_to_net_income_min": 0.8,  # operating cash flow below 80% of net income
+    "short_term_debt_share_max": 30.0,  # % of borrowings due short term
+    "current_ratio_min": 1.0,
+    "inventory_minus_revenue_growth_max": 10.0,  # %p
+    "trend_worse_pct": 15.0,  # coverage or leverage worse by this much in a year
+    "dso_increase_days": 15.0,
+}
