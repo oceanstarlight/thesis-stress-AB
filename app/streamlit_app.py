@@ -85,6 +85,48 @@ def guidance_ledger(query: str, as_of: str) -> str:
     return json.dumps(asdict(lg), ensure_ascii=False, indent=2)
 
 
+@st.cache_data(show_spinner=False, ttl=24 * 3600)
+def search_companies(query: str) -> list[tuple[str, str]]:
+    """(CIK, label) candidates for a name, ticker or CIK."""
+    src = SecSource(http())
+    if not src.available()[0]:
+        return []
+    try:
+        return [(c.cik, c.label) for c in src.search(query, limit=10)]
+    except Exception:  # noqa: BLE001 - no User-Agent or network: fall back to the raw input
+        return []
+
+
+@st.cache_data(show_spinner=False, ttl=24 * 3600)
+def company_warnings(cik: str) -> list[str]:
+    src = SecSource(http())
+    if not src.available()[0] or not cik.isdigit():
+        return []
+    try:
+        return [w.message for w in src.profile(cik).warnings]
+    except Exception:  # noqa: BLE001
+        return []
+
+
+def company_picker(container, key: str) -> str:
+    """Name/ticker/CIK box plus a candidate list; returns the CIK to run (or the raw input)."""
+    q = container.text_input("회사 이름 · 종목코드 · CIK (미국 상장사)", key=key,
+                             help="예: alphabet, hawaiian electric, AES, 1603145. 입력 후 Enter를 누르면 후보가 뜬다.")
+    found = search_companies(q.strip()) if q.strip() else []
+    if not found:
+        if q.strip():
+            container.caption("후보 없음. 종목코드나 CIK로 다시 입력해 봐.")
+        return q.strip()
+    labels = {cik: label for cik, label in found}
+    cik = container.selectbox("후보", list(labels), format_func=labels.get, key=f"{key}_pick",
+                              label_visibility="collapsed") if len(found) > 1 else found[0][0]
+    if len(found) == 1:
+        container.caption(f"→ {labels[cik]}")
+    for w in company_warnings(cik):
+        container.warning(w)
+    return cik
+
+
 def sidebar() -> None:
     st.sidebar.title("RiskProbe")
     st.sidebar.caption("투자 판단이 어떤 조건에서 틀리는지 찾고(Probe), 보유 중 그 조건에 가까워지는지 감시하고(Watch), "
@@ -106,7 +148,7 @@ def probe_tab() -> None:
     st.session_state.setdefault("probe_q", "AES")
     st.session_state.setdefault("probe_d", date.today().isoformat())
     c1, c2 = st.columns([2, 1])
-    q = c1.text_input("종목코드 또는 CIK (미국 상장사)", key="probe_q")
+    q = company_picker(c1, "probe_q")
     d = c2.text_input("판단 기준일 (YYYY-MM-DD)", key="probe_d")
     with st.expander("선택 입력 (공시에 없을 때만)"):
         e1, e2, e3, e4 = st.columns(4)
@@ -225,7 +267,7 @@ def review_tab() -> None:
     st.session_state.setdefault("rv_end", "2025-06-30")
     st.session_state.setdefault("rv_g", False)
     c1, c2, c3 = st.columns([2, 1, 1])
-    q = c1.text_input("종목코드 또는 CIK (미국 상장사)", key="rv_q")
+    q = company_picker(c1, "rv_q")
     t0 = c2.text_input("판단 기준일", key="rv_t0")
     end = c3.text_input("점검일", key="rv_end")
     c4, c5, c6 = st.columns(3)

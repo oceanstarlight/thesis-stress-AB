@@ -50,3 +50,49 @@ def test_fetch_failure_becomes_unknown(monkeypatch):
     res = sec.SecSource(http).load("ABC")
     assert [u.code for u in res.unknowns] == ["sec_error"]
     assert not any(ch.isdigit() for u in res.unknowns for ch in u.message)
+
+
+def names_http():
+    http = fakes.FakeHttp()
+    http.add(sec.TICKERS, {
+        "0": {"cik_str": 1652044, "ticker": "GOOGL", "title": "Alphabet Inc."},
+        "1": {"cik_str": 1652044, "ticker": "GOOG", "title": "Alphabet Inc."},
+        "2": {"cik_str": 19617, "ticker": "JPM", "title": "JPMORGAN CHASE & CO"},
+        "3": {"cik_str": 354707, "ticker": "HE", "title": "HAWAIIAN ELECTRIC INDUSTRIES INC"},
+        "4": {"cik_str": 77, "ticker": "ALPH", "title": "Alphabetic Trust Capital LLC"},
+    })
+    return http
+
+
+def test_search_by_name_ticker_and_cik(monkeypatch):
+    monkeypatch.setenv("SEC_USER_AGENT", UA)
+    src = sec.SecSource(names_http())
+    found = src.search("alphabet")
+    assert [c.cik for c in found] == ["0001652044", "0000000077"]  # one row per company, exact name first
+    assert found[0].tickers == ["GOOGL", "GOOG"] and found[0].label == "Alphabet Inc. (GOOGL, GOOG)"
+    assert src.search("Hawaiian Electric")[0].ticker == "HE"
+    assert src.search("jp morgan")[0].ticker == "JPM"
+    assert src.search("goog")[0].ticker == "GOOGL"  # exact ticker beats name prefix
+    assert src.cik_for("alphabet") == "0001652044"
+    assert src.cik_for("1652044") == "0001652044"
+    assert src.search("zzzz") == [] and src.cik_for("zzzz") is None
+
+
+def test_profile_warns_for_foreign_filers_and_financials():
+    foreign = sec.profile_warnings("3711", "Motor Vehicles", {"20-F", "6-K"})
+    bank = sec.profile_warnings("6021", "National Commercial Banks", {"10-K", "10-Q", "8-K"})
+    reit = sec.profile_warnings("6798", "Real Estate Investment Trusts", {"10-K", "10-Q"})
+    assert [u.code for u in foreign] == ["sec_foreign_filer"]
+    assert [u.code for u in bank] == ["sec_financial_sector"]
+    assert reit == []
+    assert not any(ch.isdigit() for u in foreign + bank for ch in u.message)
+
+
+def test_load_adds_profile_warnings(monkeypatch):
+    monkeypatch.setenv("SEC_USER_AGENT", UA)
+    http = make_http()
+    sub = http.routes[1][3]
+    sub.update(sic="6021", sicDescription="National Commercial Banks")
+    res = sec.SecSource(http).load("ABC")
+    assert "sec_financial_sector" in {u.code for u in res.unknowns}
+    assert sec.SecSource(http).profile("42").warnings[0].code == "sec_financial_sector"
