@@ -3,6 +3,7 @@
 투자 판단이 어떤 조건에서 틀릴 수 있는지 투자 전에 찾아 기록하고(Probe), 보유 중에는 그 조건에 가까워지는지 감시하며(Watch), 투자 후에는 그 판단이 왜, 어떤 종류로 틀렸는지 감사하는(Audit) AI Agent입니다. 「국부펀드 KIC, AI 에이전트 공모전」 출품용입니다.
 
 - 계획·미정 사항: [`PLANS.md`](PLANS.md)
+- 파이프라인 그림: [`docs/images/pipeline.png`](docs/images/pipeline.png)
 - P0 결과: [`docs/p0_findings.md`](docs/p0_findings.md), P1 결과: [`docs/p1_findings.md`](docs/p1_findings.md)
 - 외부 자원 출처: [`SOURCES.md`](SOURCES.md)
 

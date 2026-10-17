@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<style>
+  :root { --code:#1f6feb; --code-bg:#eaf2ff; --llm:#b15c00; --llm-bg:#fff1e0; --grp:#f6f8fa; --line:#d0d7de; --ink:#1f2328; --muted:#57606a; --ledger:#1a7f37; --ledger-bg:#e6f6ea; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#fff; font-family:"WenQuanYi Zen Hei", sans-serif; color:var(--ink); width:1600px; }
+  .wrap { padding:28px 34px 30px; }
+  h1 { font-size:30px; margin:0 0 4px; }
+  .sub { color:var(--muted); font-size:16px; margin-bottom:18px; }
+  .legend { display:flex; gap:18px; font-size:15px; margin-bottom:16px; }
+  .legend span { display:inline-flex; align-items:center; gap:6px; }
+  .sw { width:16px; height:16px; border-radius:4px; display:inline-block; }
+  .box { border-radius:10px; padding:9px 12px; font-size:16px; line-height:1.35; text-align:center; }
+  .code { background:var(--code-bg); border:2px solid var(--code); }
+  .llm { background:var(--llm-bg); border:2px solid var(--llm); }
+  .ledger { background:var(--ledger-bg); border:2px solid var(--ledger); }
+  .grp { background:var(--grp); border:2px dashed var(--line); border-radius:12px; padding:10px 12px 12px; }
+  .grp > .t { font-size:14px; color:var(--muted); margin-bottom:8px; font-weight:bold; }
+  .row { display:flex; gap:10px; }
+  .row > * { flex:1; }
+  .arrow { text-align:center; color:var(--muted); font-size:22px; line-height:1; margin:6px 0; }
+  .lanes { display:grid; grid-template-columns:1fr 1fr 1fr; gap:22px; margin-top:6px; }
+  .lane { border:2px solid var(--line); border-radius:14px; padding:12px 14px 14px; }
+  .lane h2 { margin:0 0 10px; font-size:21px; }
+  .lane h2 small { font-size:15px; color:var(--muted); font-weight:normal; }
+  .small { font-size:13.5px; color:var(--muted); }
+  .data { display:grid; grid-template-columns:2.2fr auto 1fr auto 1fr auto 1.25fr; gap:10px; align-items:center; }
+  .h { font-size:22px; color:var(--muted); text-align:center; }
+  .ledgerbar { margin:14px 0 4px; display:grid; grid-template-columns:1fr 2.4fr 1fr; gap:14px; align-items:center; }
+</style></head>
+<body><div class="wrap">
+  <h1>RiskProbe 작동 파이프라인</h1>
+  <div class="sub">투자 판단이 어떤 조건에서 틀리는지 찾고(Probe) · 보유 중 감시하고(Watch) · 사후에 감사한다(Audit)</div>
+  <div class="legend">
+    <span><i class="sw" style="background:var(--code-bg);border:2px solid var(--code)"></i>코드 (계산·판정)</span>
+    <span><i class="sw" style="background:var(--llm-bg);border:2px solid var(--llm)"></i>LLM (문장 추출·해석, 원문 인용 검증)</span>
+    <span><i class="sw" style="background:var(--ledger-bg);border:2px solid var(--ledger)"></i>가정 원장</span>
+    <span><i class="sw" style="background:var(--grp);border:2px dashed var(--line)"></i>병렬·다중 모듈 묶음</span>
+  </div>
+
+  <!-- shared data layer -->
+  <div class="data">
+    <div class="grp"><div class="t">데이터 수집 (병렬)</div>
+      <div class="row">
+        <div class="box code">SEC XBRL<br><span class="small">값·공시별 버전</span></div>
+        <div class="box code">공시 원문<br><span class="small">10-K · 8-K · EX-99</span></div>
+        <div class="box code">금리<br><span class="small">SOFR · 국채 10년</span></div>
+      </div>
+    </div>
+    <div class="h">→</div>
+    <div class="box code">데이터 품질<br><span class="small">이상 값 · 부호 오류 · 재작성 혼합 차단</span></div>
+    <div class="h">→</div>
+    <div class="box code"><b>기준일 스냅샷</b><br><span class="small">그날까지 공개된 값만</span></div>
+    <div class="h">→</div>
+    <div class="box code">지표 카탈로그<br><span class="small">TTM · 조정 EBITDA · 12개 지표</span></div>
+  </div>
+
+  <div class="ledgerbar">
+    <div class="box llm">전망·메모 추출<br><span class="small">실적 발표 · 사용자 메모</span></div>
+    <div class="box ledger"><b>가정 원장</b> — 가정 · 깨지는 조건 · 기준값(출처) · 기록 시점 · 입력값 · 상태 이력</div>
+    <div class="small" style="text-align:left">Probe가 기록 → Watch·Audit이 읽음</div>
+  </div>
+
+  <div class="lanes">
+    <!-- Probe -->
+    <div class="lane"><h2>Probe <small>투자 전</small></h2>
+      <div class="box code">10-K 문단 선별 <span class="small">(키워드, 약 1/10)</span></div>
+      <div class="arrow">↓</div>
+      <div class="box llm">위험 요인 · 변동금리 · 약정 · 고객 추출<br><span class="small">인용 확인 · 숫자는 코드 파싱</span></div>
+      <div class="arrow">↓</div>
+      <div class="grp"><div class="t">역산: 깨지는 충격 크기 (병렬)</div>
+        <div class="row"><div class="box code">EBITDA ↓<br>→ 이자보상</div><div class="box code">금리 ↑<br>→ 이자보상</div><div class="box code">EBITDA ↓<br>→ 레버리지</div></div>
+        <div class="small" style="margin-top:6px">× 공시·조정 EBITDA × 기본 규칙·공시 약정</div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="grp"><div class="t">반증 탐색 (병렬)</div>
+        <div class="row"><div class="box code">지표</div><div class="box code">1년 추세</div><div class="box code">8-K</div><div class="box code">10-K 서술</div></div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="row"><div class="box code">결론 · 등급</div><div class="box llm">숫자 없는 해석</div></div>
+      <div class="arrow">↓</div>
+      <div class="box ledger">위험 보고서 + 원장 기록</div>
+    </div>
+
+    <!-- Watch -->
+    <div class="lane"><h2>Watch <small>보유 중 · 평일 매일</small></h2>
+      <div class="grp"><div class="t">트리거 (병렬)</div>
+        <div class="row"><div class="box code">새 정기공시</div><div class="box code">8-K 규칙<br><span class="small">재해·소송·배당</span></div><div class="box code">금리<br>±25bp</div></div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="box code">영향받는 가정만 재평가<br><span class="small">상태 악화 · 금리 경로 남은 여유</span></div>
+      <div class="arrow">↓</div>
+      <div class="box code">사건 시나리오<br><span class="small">금리 +bp · EBITDA −% → 감시 목록 전체 초과/근접</span></div>
+      <div class="arrow">↓</div>
+      <div class="box code">감시 브리프 · GitHub Issue 경보</div>
+      <div class="small" style="margin-top:10px;text-align:center">LLM 호출 0회</div>
+    </div>
+
+    <!-- Audit -->
+    <div class="lane"><h2>Audit <small>투자 후</small></h2>
+      <div class="box ledger">원장 기록 시점 (T0)</div>
+      <div class="arrow">↓</div>
+      <div class="grp"><div class="t">공시일 순서로 재생 (시점마다 스냅샷 재계산)</div>
+        <div class="row"><div class="box code">정기공시<br><span class="small">지표 가정</span></div><div class="box code">실적 발표<br><span class="small">전망 재언급</span></div><div class="box code">8-K<br><span class="small">사건</span></div></div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="box code">상태 판정 · 최초 경고 시점</div>
+      <div class="arrow">↓</div>
+      <div class="box code">실패 유형<br><span class="small">신호 놓침 · 상황 변화 · 일시적 흔들림 · 가정 유지 (+가정 무리)</span></div>
+      <div class="arrow">↓</div>
+      <div class="box code">감사 보고서<br><span class="small">당시 알 수 있던 것 vs 나중에 안 것</span></div>
+    </div>
+  </div>
+</div></body></html>
