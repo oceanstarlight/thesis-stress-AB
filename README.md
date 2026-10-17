@@ -3,6 +3,7 @@
 투자 판단이 어떤 조건에서 틀릴 수 있는지 투자 전에 찾아 기록하고(Probe), 보유 중에는 그 조건에 가까워지는지 감시하며(Watch), 투자 후에는 그 판단이 왜, 어떤 종류로 틀렸는지 감사하는(Audit) AI Agent입니다. 「국부펀드 KIC, AI 에이전트 공모전」 출품용입니다.
 
 - 계획·미정 사항: [`PLANS.md`](PLANS.md)
+- 파이프라인 그림: [`docs/images/pipeline.png`](docs/images/pipeline.png)
 - P0 결과: [`docs/p0_findings.md`](docs/p0_findings.md), P1 결과: [`docs/p1_findings.md`](docs/p1_findings.md)
 - 외부 자원 출처: [`SOURCES.md`](SOURCES.md)
 
@@ -14,6 +15,7 @@ cp .env.example .env   # SEC_USER_AGENT 등 입력
 python -m pytest -q    # 네트워크·키 불필요
 python scripts/p0_check.py AES 2023-06-30 2025-06-30   # SEC 기준일 복원 점검
 python scripts/p1_check.py AMT AES --as-of 2023-06-30 2025-06-30   # 지표·역산 점검
+python scripts/review.py HE --t0 2023-06-30 --end 2025-06-30   # 통합 검토: 입력 하나 → 판단 카드 하나
 python scripts/probe.py AES --as-of 2025-06-30   # Probe 위험 보고서 → reports/, 가정 원장 → data/ledger/
 python scripts/thesis.py 1603145 --as-of 2023-06-30 --name XPLR_guidance   # 기업 전망으로 원장 만들기
 python scripts/audit.py data/ledger/HE_2023-06-30.json --end 2025-06-30   # Audit 감사 보고서
@@ -44,3 +46,4 @@ streamlit run app/streamlit_app.py   # 앱 (배포: docs/deploy.md)
 | 앱 | `app/streamlit_app.py` | Probe·Audit·데이터 탭, 데모 버튼 |
 | 금리 | `riskprobe/sources/rates.py` | SOFR(뉴욕 연준), 국채 10년물(연준 H.15) |
 | Watch | `riskprobe/watch.py`, `watch_report.py`, `.github/workflows/watch.yml` | 기간 중 정기공시 재평가·수시공시·금리 트리거, 사건 시나리오, 평일 매일 실행·Issue 경보 |
+| 통합 검토 | `riskprobe/lifecycle.py`, `lifecycle_report.py`, `scripts/review.py` | 기준일 Probe + 한 번의 재생 + 금리·시나리오 → 종합 판정(재검토 필요/주의/유지)과 판단 카드. 앱 메인 탭 |
