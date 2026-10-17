@@ -183,9 +183,13 @@ def _ledger(out: ProbeResult, query: str, as_of: str) -> Ledger:
             continue
         statement, ind, direction = _STATEMENTS[r.template]
         n += 1
+        inputs = {"floating_debt": r.inputs["floating_debt"]} if r.template == "rate_rise_to_coverage" else {}
+        if r.template == "rate_rise_to_coverage":
+            inputs["shock_bp_at_record"] = r.shock
         lg.add(Assumption(f"A{n}", f"{statement} ({s.threshold_label})", "financial", ind, direction, r.threshold,
                           path_template=r.template, recorded_at=as_of,
-                          source_url=out.filing.url if out.filing else ""))
+                          source_url=out.filing.url if out.filing else "",
+                          inputs=inputs, input_notes=list(s.input_notes)))
     for v in (out.extraction.of("customer") if out.extraction else []):
         n += 1
         lg.add(Assumption(f"A{n}", f"주요 고객({v.item.name}) 매출 비중이 유지된다", "demand", "", "above", None,

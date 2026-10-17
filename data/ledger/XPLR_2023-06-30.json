@@ -1,7 +1,7 @@
 {
   "entity": "1603145",
   "name": "XPLR Infrastructure, LP",
-  "created_at": "2026-10-17T12:06:11Z",
+  "created_at": "2026-10-17T12:42:34Z",
   "assumptions": [
     {
       "id": "A1",
@@ -20,7 +20,9 @@
       "source_url": "https://www.sec.gov/Archives/edgar/data/1603145/000160314523000005/nep-20221231.htm",
       "recorded_at": "2023-06-30",
       "user_confirmed": false,
-      "history": []
+      "history": [],
+      "inputs": {},
+      "input_notes": []
     }
   ]
 }

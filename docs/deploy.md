@@ -19,6 +19,12 @@
    앱이 시작할 때 `st.secrets`의 최상위 문자열 값을 환경 변수로 옮기므로 코드 수정 없이 읽힌다.
 3. 배포 후 확인: 사이드바에 `🟢 SEC EDGAR`, `🟢 LLM: gemini`가 보이는지 → Probe 데모 버튼(AES) → Audit 탭 데모(HE).
 
+## 예약 감시 (GitHub Actions `watch`)
+
+- 평일 매일 22:17 UTC에 `data/watchlist.json`의 원장을 확인하고, 새 경보(높음·중간)가 있으면 GitHub Issue를 연다.
+- 필요한 설정: 저장소 Settings → Secrets and variables → Actions → **`SEC_USER_AGENT`** 추가. LLM 키는 필요 없다.
+- 마지막 실행일은 Actions 캐시(`watch_state/state.json`)에 저장돼 다음 실행이 그 이후만 본다. 수동 실행: Actions → watch → Run workflow.
+
 ## 운영 메모
 
 - 첫 실행은 SEC 데이터(기업별 companyfacts 수 MB, 10-K 원문 수 MB)를 받느라 기업당 수십 초 걸린다. 같은 입력은 앱 캐시(6시간)와 디스크 HTTP 캐시(24시간)로 다시 받지 않는다.

@@ -1,0 +1,61 @@
+name: watch
+
+# Daily check of the watchlist (data/watchlist.json): new filings, 8-Ks and rate moves since
+# the previous run. No LLM call. New high/medium alerts open a GitHub issue.
+on:
+  schedule:
+    - cron: "17 22 * * 1-5"  # after US market close and EDGAR's daily batch
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: Restore watch state and HTTP cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            watch_state
+            data/cache
+          key: watch-state-${{ github.run_id }}
+          restore-keys: watch-state-
+
+      - name: Run watch
+        id: run
+        env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+        run: python scripts/watch.py --state-dir watch_state
+
+      - name: Save watch state and HTTP cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            watch_state
+            data/cache
+          key: watch-state-${{ github.run_id }}
+
+      - name: Open an issue for new alerts
+        if: steps.run.outputs.alerts != '' && steps.run.outputs.alerts != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "RiskProbe watch alert $(date -u +'%Y-%m-%d')" \
+            --body-file watch_state/new_alerts.md
