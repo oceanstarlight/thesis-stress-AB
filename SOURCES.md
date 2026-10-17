@@ -7,6 +7,12 @@
 | SEC EDGAR (`data.sec.gov` submissions, companyfacts; `www.sec.gov` company_tickers, Archives) | 미국 상장사 공시 목록·XBRL 재무값·원문 링크 | 공개 데이터, 키 불필요. 연락처가 담긴 User-Agent 필수, 초당 10건 이하 (https://www.sec.gov/os/accessing-edgar-data) | 요청 간격 0.12초로 제한 |
 | OpenDART (금융감독원) | 한국 상장사 공시 목록·재무제표·원본 XBRL | 무료 API 키, 일 20,000건 (https://opendart.fss.or.kr) | P0에서 원본 XBRL 다운로드 확인 |
 
+## 기본 규칙 기준값 참고 자료 (`docs/p1_findings.md`)
+
+- 대출 약정 관행: https://www.fe.training/?p=10006445 , https://hayot-expertise.fr/en/blog/banking-covenants-understand-respect , https://ibinterviewquestions.com/blog/debt-covenants-maintenance-vs-incurrence
+- S&P 재무위험 매트릭스(구버전): https://www.maalot.co.il/Publications/MT20190402125127.PDF
+- 미국 레버리지 대출 지침(2013) 해설: https://www.whitecase.com/sites/default/files/files/download/publications/article-us-leveraged-lending-guidelines.pdf , https://www.debevoise.com/insights/publications/2014/03/whats-new-leverage-lending-guidance
+
 ## 코드 (같은 저자의 기존 저장소에서 이식)
 
 | 원본 | 이식 위치 | 변경 |

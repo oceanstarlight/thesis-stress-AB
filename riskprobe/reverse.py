@@ -174,4 +174,4 @@ def net_debt(debt: Measured | None, cash: Measured | None) -> Measured | None:
 
 def default_threshold(indicator: str) -> Threshold | None:
     v = config.DEFAULT_THRESHOLDS.get(indicator)
-    return Threshold(v, "default_rule", f"기본 규칙: {indicator}") if v is not None else None
+    return Threshold(v, "default_rule", f"기본 규칙: {indicator} ({config.DEFAULT_THRESHOLD_BASIS})") if v is not None else None

@@ -70,6 +70,12 @@ LINE_ITEMS = {li.id: li for li in [
         ("LongTermDebtAndCapitalLeaseObligations", "LongTermDebtAndCapitalLeaseObligationsCurrent"),
         ("LongTermDebtAndCapitalLeaseObligations", "DebtCurrent")), nonnegative=True),
     LineItem("short_term_borrowings", "단기차입금", False, _alts("ShortTermBorrowings", "CommercialPaper"), nonnegative=True),
+    # Impairments, for adjusted EBITDA (PLANS.md 12). Goodwill and other assets are separate
+    # groups because companies tag them separately; within a group the first tag found is used.
+    LineItem("impairment_goodwill", "영업권 손상차손", True, _alts("GoodwillAndIntangibleAssetImpairment", "GoodwillImpairmentLoss"),
+             nonnegative=True),
+    LineItem("impairment_assets", "자산 손상차손", True, _alts("AssetImpairmentCharges", "ImpairmentOfLongLivedAssetsHeldForUse"),
+             nonnegative=True),
     LineItem("current_assets", "유동자산", False, _alts("AssetsCurrent")),
     LineItem("current_liabilities", "유동부채", False, _alts("LiabilitiesCurrent")),
     LineItem("inventory", "재고자산", False, _alts("InventoryNet"), nonnegative=True),
@@ -227,6 +233,40 @@ class Book:
             return Measured(fy.value + cur[0].value - prior[0].value, _shift_day(_one_year_before(end), 1), end, used, "ltm")
         return None
 
+    def ttm_sparse(self, item_id: str, end: str) -> tuple[Measured | None, list[str]]:
+        """TTM for items reported only when non-zero (impairments).
+
+        Last fiscal year + current year-to-date - prior year-to-date, where a part that was not
+        reported counts as zero. Returns (value, parts assumed zero); None when nothing was
+        reported in the window. The assumption is shown with the result."""
+        fy_ends = sorted(e for item in ("revenue", "operating_cash_flow") for e in self.years(item) if e <= end)
+        if not fy_ends or _days_between(fy_ends[-1], end) > 300:
+            return None, []
+        fy_end = fy_ends[-1]
+        li = LINE_ITEMS[item_id]
+        for alt in li.alternatives:
+            durs = [f for f in self.snap.facts.values() if f.concept == alt[0] and f.unit == "USD" and f.days]
+            fy = next((f for f in durs if f.period_end == fy_end and YEAR_DAYS[0] <= f.days <= YEAR_DAYS[1]), None)
+            if fy_end == end:
+                cur = prior = None
+            else:
+                cur = next((f for f in durs if f.period_end == end
+                            and abs(_days_between(_shift_day(fy_end, 1), f.period_start)) <= 7), None)
+                prev_end, fy_start = _one_year_before(end), _shift_day(_one_year_before(fy_end), 1)
+                prior = next((f for f in durs if abs(_days_between(f.period_end, prev_end)) <= 7
+                              and abs(_days_between(f.period_start, fy_start)) <= 7), None)
+            parts = {"직전 연간": fy, "당기 누계": cur, "전기 누계": prior}
+            used = [f for f in parts.values() if f is not None]
+            if not used:
+                continue
+            m = Measured((fy.value if fy else 0.0) + (cur.value if cur else 0.0) - (prior.value if prior else 0.0),
+                         None, end, used, "ltm_sparse")
+            if self.snap.mixes_bases(used) or not self._sign_ok(li, Measured(0.0, None, end, used, "ltm_sparse")):
+                return None, []
+            zero = [k for k, f in parts.items() if f is None and not (fy_end == end and k != "직전 연간")]
+            return m, zero
+        return None, []
+
     def at(self, item_id: str, end: str) -> Measured | None:
         """Balance at ``end`` (within a few days, fiscal calendars drift)."""
         for e, m in self.instants(item_id).items():
@@ -339,6 +379,33 @@ def compute(book: Book, end: str | None = None) -> dict[str, Indicator]:
             _ratio(ind, debt.value - cash.value, ebitda)
     elif ebitda is None:
         _need(ind, total_debt=debt, cash=cash, operating_income=oi, d_and_a=da)
+
+    # Adjusted EBITDA: add back impairments found in standard tags (PLANS.md 12, option B).
+    imp_parts = {k: book.ttm_sparse(k, end) for k in ("impairment_goodwill", "impairment_assets")}
+    found = {k: v for k, v in imp_parts.items() if v[0] is not None}
+    ind = new("ebitda_adjusted", "조정 EBITDA(TTM, 손상차손 가산)", "USD",
+              "EBITDA + 표준 태그로 확인된 손상차손 (영업권 + 기타 자산)")
+    if ebitda is not None and found:
+        ind.inputs.update({k: v[0] for k, v in found.items()})
+        ind.value = ebitda + sum(v[0].value for v in found.values())
+        zero = sorted({z for v in found.values() for z in v[1]})
+        if zero:
+            ind.formula += " · 보고되지 않은 기간(" + ", ".join(zero) + ")은 손상차손 없음으로 간주"
+        if len(found) < len(imp_parts):
+            ind.unknowns.append(Unknown("impairment_partial", "일부 손상차손 항목은 표준 태그로 확인되지 않아 더하지 않음"))
+    elif ebitda is not None:
+        ind.unknowns.append(Unknown("impairment_not_found", "최근 열두 달 손상차손이 표준 태그로 확인되지 않아 조정하지 않음"))
+    adj = out["ebitda_adjusted"].value
+    if adj is not None:
+        ind = new("interest_coverage_adjusted", "이자보상배율(조정 EBITDA 기준)", "x", "조정 EBITDA / 이자비용")
+        if _need(ind, interest_expense=interest):
+            _ratio(ind, adj, interest.value)
+        ind = new("net_debt_to_ebitda_adjusted", "순차입금/조정 EBITDA", "x", "(총차입금 - 현금성자산) / 조정 EBITDA")
+        if _need(ind, total_debt=debt, cash=cash):
+            if adj <= 0:
+                ind.unknowns.append(Unknown("indicator_negative_ebitda", "조정 EBITDA가 영 이하라 차입 배수가 의미 없어 계산하지 않음"))
+            else:
+                _ratio(ind, debt.value - cash.value, adj)
 
     std = book.at("short_term_borrowings", end)
     ind = new("short_term_debt_share", "단기차입 비중", "%", "단기차입금 / (총차입금 + 단기차입금)")

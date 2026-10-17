@@ -42,7 +42,14 @@ MIN_INTERVAL_SEC = {"www.sec.gov": 0.12, "data.sec.gov": 0.12}
 
 # Default rules (PLANS.md 2.4, 7.1). Used only when neither the user nor a filing gives a
 # threshold, always labeled "기본 규칙" with the source, and changeable by the user.
+# There is no single market standard (docs/p1_findings.md). The values sit inside commonly
+# cited ranges: maintenance covenants ~2.0-3.0x minimum interest coverage and ~4.0-6.0x
+# maximum leverage; S&P's financial risk matrix puts debt/EBITDA above 5x in its most
+# leveraged band; US leveraged lending guidance (2013) flags total debt/EBITDA above 6x.
 # Thresholds: indicator -> floor (coverage) or cap (leverage).
-DEFAULT_THRESHOLDS = {"interest_coverage": 2.0, "net_debt_to_ebitda": 5.0}
+DEFAULT_THRESHOLDS = {"interest_coverage": 2.0, "net_debt_to_ebitda": 5.0,
+                      "interest_coverage_adjusted": 2.0, "net_debt_to_ebitda_adjusted": 5.0}
+DEFAULT_THRESHOLD_BASIS = ("보편 범위 내 값: 유지 약정 이자보상배율 최저 약 2~3배, 레버리지 최고 약 4~6배, "
+                           "S&P 재무위험 매트릭스 최고 레버리지 구간 5배 초과, 미국 레버리지 대출 지침 6배 초과 주의")
 # Headroom grade: a shock smaller than this (but above zero) is "근접".
 HEADROOM_NEAR = {"%": 15.0, "bp": 100.0}

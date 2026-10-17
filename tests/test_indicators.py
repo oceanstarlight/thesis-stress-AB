@@ -143,3 +143,28 @@ def test_negative_expense_is_treated_as_sign_error_not_flipped():
     assert "2024-12-31" not in b.years("interest_expense")
     assert [u.code for u in b.unknowns] == ["sign_error_suspected"]
     assert b.ttm("interest_expense", "2025-03-31").value == 42  # still from the reported quarters
+
+
+def test_adjusted_ebitda_adds_back_reported_impairment_with_stated_assumption():
+    facts = FACTS + [dur("GoodwillImpairmentLoss", "2024-01-01", "2024-12-31", 50)]
+    ind = indicators.compute(indicators.Book(pit.snapshot(facts, "2025-06-30")))
+    assert ind["ebitda"].value == 160
+    assert ind["ebitda_adjusted"].value == 210
+    assert "손상차손 없음으로 간주" in ind["ebitda_adjusted"].formula
+    assert [u.code for u in ind["ebitda_adjusted"].unknowns] == ["impairment_partial"]
+    assert ind["interest_coverage_adjusted"].value == pytest.approx(210 / 42)
+    assert ind["net_debt_to_ebitda_adjusted"].value == pytest.approx(500 / 210)
+
+
+def test_no_impairment_reported_means_no_adjusted_figure(book):
+    ind = indicators.compute(book)
+    assert ind["ebitda_adjusted"].value is None
+    assert [u.code for u in ind["ebitda_adjusted"].unknowns] == ["impairment_not_found"]
+    assert "interest_coverage_adjusted" not in ind
+
+
+def test_negative_impairment_is_sign_error():
+    facts = FACTS + [dur("GoodwillAndIntangibleAssetImpairment", "2024-01-01", "2024-12-31", -50)]
+    b = indicators.Book(pit.snapshot(facts, "2025-06-30"))
+    assert indicators.compute(b)["ebitda_adjusted"].value is None
+    assert "sign_error_suspected" in {u.code for u in b.unknowns}

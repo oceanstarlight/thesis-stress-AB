@@ -44,18 +44,22 @@ def main() -> int:
             for i in ind.values():
                 missing = "; ".join(u.detail for u in i.unknowns)
                 print(f"  {i.label_ko:28} {show(i.value, i.unit):>12}  {('missing: ' + missing) if missing else ''}")
-            e = ind.get("ebitda")
-            if e and e.value is not None:
-                end = book.anchor()
-                rs = [
+            end = book.anchor()
+            rs = []
+            for key, suffix in (("ebitda", ""), ("ebitda_adjusted", "_adjusted")):
+                e = ind.get(key)
+                if e is None or e.value is None:
+                    continue
+                rs += [
                     reverse.ebitda_drop_to_coverage(e.value, book.ttm("interest_expense", end),
-                                                    reverse.default_threshold("interest_coverage")),
+                                                    reverse.default_threshold("interest_coverage" + suffix)),
                     reverse.ebitda_drop_to_leverage(reverse.net_debt(book.at("total_debt", end), book.at("cash", end)),
-                                                    e.value, reverse.default_threshold("net_debt_to_ebitda")),
+                                                    e.value, reverse.default_threshold("net_debt_to_ebitda" + suffix)),
                 ]
+            if rs:
                 for r in rs:
-                    print(f"  [역산] {r.label_ko}: {r.status} shock={show(r.shock, r.unit)} grade={r.grade or '-'} "
-                          f"(기준 {r.threshold.value if r.threshold else '-'}, {r.threshold.source if r.threshold else ''})")
+                    print(f"  [역산] {r.label_ko} [{'조정' if 'adjusted' in (r.threshold.note if r.threshold else '') else '공시'}]: "
+                          f"{r.status} shock={show(r.shock, r.unit)} grade={r.grade or '-'}")
             for u in book.unknowns:
                 print(f"  [{u.code}] {u.message}")
     return 0
