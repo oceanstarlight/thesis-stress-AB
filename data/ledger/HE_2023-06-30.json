@@ -1,0 +1,41 @@
+{
+  "entity": "HE",
+  "name": "HAWAIIAN ELECTRIC INDUSTRIES INC",
+  "created_at": "2026-10-17T11:50:16Z",
+  "assumptions": [
+    {
+      "id": "A1",
+      "statement": "순차입금/EBITDA가 기준 이하로 유지된다 (기본 규칙)",
+      "type": "financial",
+      "indicator": "net_debt_to_ebitda",
+      "direction": "below",
+      "threshold": {
+        "value": 5.0,
+        "source": "default_rule",
+        "note": "기본 규칙: net_debt_to_ebitda (보편 범위 내 값: 유지 약정 이자보상배율 최저 약 2~3배, 레버리지 최고 약 4~6배, S&P 재무위험 매트릭스 최고 레버리지 구간 5배 초과, 미국 레버리지 대출 지침 6배 초과 주의)"
+      },
+      "path_template": "ebitda_drop_to_leverage",
+      "horizon": "",
+      "source_quote": "",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/354707/000035470723000032/he-20221231.htm",
+      "recorded_at": "2023-06-30",
+      "user_confirmed": false,
+      "history": []
+    },
+    {
+      "id": "A2",
+      "statement": "주요 고객(federal government agencies) 매출 비중이 유지된다",
+      "type": "demand",
+      "indicator": "",
+      "direction": "above",
+      "threshold": null,
+      "path_template": "",
+      "horizon": "",
+      "source_quote": "The Utilities derived approximately 12%, 11% and 11% of their operating revenues in 2022, 2021 and 2020, respectively from the sale of electricity to various federal government agencies.",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/354707/000035470723000032/he-20221231.htm",
+      "recorded_at": "2023-06-30",
+      "user_confirmed": false,
+      "history": []
+    }
+  ]
+}
