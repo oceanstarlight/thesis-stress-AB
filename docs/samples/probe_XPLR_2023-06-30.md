@@ -30,7 +30,21 @@
 
 계산식: EBITDA 감소 → 순차입금/EBITDA 기준 초과: s = 1 - 순차입금 / (기준 배수 × EBITDA) / EBITDA 감소 → 이자보상배율 기준 미달: s = 1 - 기준 배율 × 이자비용 / EBITDA / 금리 상승 → 변동금리 이자비용 증가 → 이자보상배율 기준 미달: dr = (EBITDA / 기준 배율 - 이자비용) / 변동금리 차입금
 
-## 3. 핵심 지표
+## 3. 결론과 충돌하는 근거 (반증 탐색, 코드 규칙)
+
+| 출처 | 신호 | 내용 | 원문 |
+|---|---|---|---|
+| 재무 지표 | 재고가 매출보다 빠르게 늘어남 | 재고 증가율 - 매출 증가율 13.05 (10.0%p 초과, 기본 규칙) | [1](https://www.sec.gov/Archives/edgar/data/1603145/000160314522000018/) [2](https://www.sec.gov/Archives/edgar/data/1603145/000160314523000005/) [3](https://www.sec.gov/Archives/edgar/data/1603145/000160314523000017/) |
+| 수시공시 | 최근 1년 수시공시: 기타 사건, 소송·조사 | 2022-12-07 8-K (medium) | [1](https://www.sec.gov/Archives/edgar/data/1603145/000160314522000044/nep-20221207.htm) |
+| 수시공시 | 최근 1년 수시공시: 기타 사건, 소송·조사 | 2022-12-08 8-K (medium) | [1](https://www.sec.gov/Archives/edgar/data/1603145/000160314522000048/nep-20221208.htm) |
+| 연차보고서 | 연차보고서 위험 서술: refinancing | If NEP's subsidiaries, including NEP OpCo, do not comply with their obligations under their debt instruments, they may need to refinance all or a part of their indebtedness, which they may not be able to do on similar terms or at all. | [1](https://www.sec.gov/Archives/edgar/data/1603145/000160314523000005/nep-20221231.htm) |
+| 연차보고서 | 연차보고서 위험 서술: covenant | failure to comply with the covenants in the agreements governing these obligations could result in an event of default under those agreements, which could be difficult to cure, result in bankruptcy or, with respect to subsidiary debt, result in loss of NEP OpCo's ownership interest in one or more of | [1](https://www.sec.gov/Archives/edgar/data/1603145/000160314523000005/nep-20221231.htm) |
+| 연차보고서 | 연차보고서 위험 서술: liquidity | Disruptions, uncertainty or volatility in those capital and credit markets, related to, among other factors, inflation, rising interest rates, geopolitical events and the planned phase out of the London Inter-Bank Offered Rate or the reform or replacement of other benchmark interest rates, could inc | [1](https://www.sec.gov/Archives/edgar/data/1603145/000160314523000005/nep-20221231.htm) |
+| 연차보고서 | 연차보고서 위험 서술: credit_rating | NEP’s liquidity, ability to access credit and capital markets and cost of borrowings is dependent on its credit ratings. | [1](https://www.sec.gov/Archives/edgar/data/1603145/000160314523000005/nep-20221231.htm) |
+
+반증 신호는 더 들여다볼 이유이며, 위험하다는 판정이 아니다.
+
+## 4. 핵심 지표
 
 | 지표 | 값 | 계산식 |
 |---|---|---|
@@ -48,7 +62,7 @@
 | 매출채권 회전일수 | 42일 | 매출채권 / 매출(TTM) × 365 |
 | 유동비율 | 1.39배 | 유동자산 / 유동부채 |
 
-## 4. 공시에서 확인한 위험 요인
+## 5. 공시에서 확인한 위험 요인
 
 - **[floating_rate]** 회사는 금리 변동성으로부터 보호하기 위해 이자율 스왑을 사용하지만 이자율 변동 위험에 노출되어 있습니다.  
   > Some of NEP's subsidiaries’ indebtedness accrues interest at variable rates, and some of its subsidiaries use interest rate swaps to try to protect against market volatility.
@@ -67,7 +81,7 @@
 - **[regulatory]** 정부 또는 규제 기관의 조치는 자본 접근성에 영향을 미쳐 사업 수행에 부정적인 영향을 줄 수 있습니다.  
   > Actions taken in response to such crises by federal, state and local government or regulatory agencies may impact NEP’s ability to access capital and could have a material adverse impact on NEP's business, financial condition, liquidity, results of operations and ability to make cash distributions to its unitholders.
 
-## 5. 데이터 공백·분석 한계
+## 6. 데이터 공백·분석 한계
 
 - 실적 보도자료 숫자는 구조화 데이터에 없어 실제 최초 공개일이 공시일보다 빠를 수 있음
 - 구조화 재무 데이터가 시작되기 전 기간은 기준일 분석에 쓸 수 없음
@@ -80,11 +94,11 @@
 - 최근 열두 달 손상차손이 표준 태그로 확인되지 않아 조정하지 않음
 - 단기차입 비중 계산에 필요한 단기차입금 값이 없어 계산하지 않음
 
-## 6. 출처
+## 7. 출처
 
 - [10-Q 0001603145-23-000017](https://www.sec.gov/Archives/edgar/data/1603145/000160314523000017/)
 - [10-K 2023-02-23](https://www.sec.gov/Archives/edgar/data/1603145/000160314523000005/nep-20221231.htm)
 
-## 7. 가정 원장에 기록할 항목 (사용자 승인 전)
+## 8. 가정 원장에 기록할 항목 (사용자 승인 전)
 
 - A1: 순차입금/EBITDA가 기준 이하로 유지된다 (기본 규칙) · 기준 5.0 (default_rule)

@@ -168,12 +168,23 @@ def render(res: ProbeResult, use_llm: bool = True) -> str:
             L.append(f"> {q}")
         L.append("")
 
-    L += ["## 3. 핵심 지표", "", "| 지표 | 값 | 계산식 |", "|---|---|---|"]
+    L += ["## 3. 결론과 충돌하는 근거 (반증 탐색, 코드 규칙)", ""]
+    if res.counters:
+        L += ["| 출처 | 신호 | 내용 | 원문 |", "|---|---|---|---|"]
+        kinds = {"indicator": "재무 지표", "trend": "1년 추세", "event": "수시공시", "filing": "연차보고서"}
+        for c in res.counters:
+            links = " ".join(f"[{i}]({u})" for i, u in enumerate(c.urls, 1)) or "-"
+            L.append(f"| {kinds[c.source]} | {c.label_ko} | {c.detail.replace('|', '/')} | {links} |")
+        L += ["", "반증 신호는 더 들여다볼 이유이며, 위험하다는 판정이 아니다.", ""]
+    else:
+        L += ["- 기본 규칙에 걸리는 반증 신호 없음 (규칙에 없는 위험이 없다는 뜻은 아님)", ""]
+
+    L += ["## 4. 핵심 지표", "", "| 지표 | 값 | 계산식 |", "|---|---|---|"]
     for ind in res.indicators.values():
         L.append(f"| {ind.label_ko} | {num(ind.value, ind.unit)} | {ind.formula} |")
     L.append("")
 
-    L += ["## 4. 공시에서 확인한 위험 요인", ""]
+    L += ["## 5. 공시에서 확인한 위험 요인", ""]
     ex = res.extraction
     if ex and ex.items:
         for v in ex.of("risk"):
@@ -184,7 +195,7 @@ def render(res: ProbeResult, use_llm: bool = True) -> str:
         L.append("- 문서 기반 위험 요인 없음 (아래 데이터 한계 참고)")
     L.append("")
 
-    L += ["## 5. 데이터 공백·분석 한계", ""]
+    L += ["## 6. 데이터 공백·분석 한계", ""]
     seen = set()
     for u in res.unknowns + [u for s in res.scenarios for u in s.result.unknowns] + \
             [u for i in res.indicators.values() for u in i.unknowns]:
@@ -195,7 +206,7 @@ def render(res: ProbeResult, use_llm: bool = True) -> str:
         L.append(f"- LLM 해석을 쓰지 않음 ({why})")
     L.append("")
 
-    L += ["## 6. 출처", ""]
+    L += ["## 7. 출처", ""]
     urls = {}
     for s in res.scenarios:
         for e in s.result.evidence:
@@ -206,7 +217,7 @@ def render(res: ProbeResult, use_llm: bool = True) -> str:
         L.append(f"- [{t}]({u})")
     L.append("")
     if res.ledger and res.ledger.assumptions:
-        L += ["## 7. 가정 원장에 기록할 항목 (사용자 승인 전)", ""]
+        L += ["## 8. 가정 원장에 기록할 항목 (사용자 승인 전)", ""]
         for a in res.ledger.assumptions:
             th = f"{a.threshold.value} ({a.threshold.source})" if a.threshold else "정성"
             L.append(f"- {a.id}: {a.statement} · 기준 {th}")
