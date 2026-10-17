@@ -15,9 +15,12 @@ python -m pytest -q    # 네트워크·키 불필요
 python scripts/p0_check.py AES 2023-06-30 2025-06-30   # SEC 기준일 복원 점검
 python scripts/p1_check.py AMT AES --as-of 2023-06-30 2025-06-30   # 지표·역산 점검
 python scripts/probe.py AES --as-of 2025-06-30   # Probe 위험 보고서 → reports/, 가정 원장 → data/ledger/
+python scripts/thesis.py 1603145 --as-of 2023-06-30 --name XPLR_guidance   # 기업 전망으로 원장 만들기
+python scripts/audit.py data/ledger/HE_2023-06-30.json --end 2025-06-30   # Audit 감사 보고서
+streamlit run app/streamlit_app.py   # 앱 (배포: docs/deploy.md)
 ```
 
-## 현재 구현 (P0~P2)
+## 현재 구현 (P0~P3)
 
 | 구성 | 위치 | 내용 |
 |---|---|---|
@@ -33,3 +36,8 @@ python scripts/probe.py AES --as-of 2025-06-30   # Probe 위험 보고서 → re
 | 공시 추출 | `riskprobe/extract.py` | LLM 제안 → 원문 인용 확인 → 숫자는 코드가 파싱 |
 | Probe | `riskprobe/probe.py` | 기준일 데이터 → 추출 → 경로별 역산(공시/조정 EBITDA, 기본 규칙/공시 약정) → 가정 원장 |
 | 보고서 | `riskprobe/report.py` | 코드 판정 결론 + 숫자 없는 LLM 해석(감사) + 출처·한계 |
+| 반증 탐색 | `riskprobe/counter.py` | 지표 규칙·1년 추세·최근 수시공시·연차보고서 위험 서술 |
+| 수시공시 분류 | `riskprobe/events.py` | 8-K 항목 규칙 + 7.01/8.01 본문·EX-99 키워드 규칙 |
+| 전망·메모 가설 | `riskprobe/guidance.py` | 실적 발표 전망 추출(인용 검증), 원장 변환, 이후 발표의 재언급 추적 |
+| Audit | `riskprobe/audit.py`, `audit_report.py` | 공시일별 재생, 상태 판정, 실패 유형, 가정 무리 신호, 수시공시 선행 시간 |
+| 앱 | `app/streamlit_app.py` | Probe·Audit·데이터 탭, 데모 버튼 |
