@@ -14,11 +14,31 @@ from dataclasses import dataclass, field
 from riskprobe.models import Fact, Unknown
 
 
+BASIS_CHANGING_FORMS = {"10-K", "10-K/A", "10-Q/A", "8-K", "8-K/A", "20-F", "40-F"}
+
+
 @dataclass
 class Snapshot:
     as_of: str
     facts: dict[tuple, Fact] = field(default_factory=dict)  # Fact.key -> value known on as_of
     unknowns: list[Unknown] = field(default_factory=list)
+    # concept -> dates on which an annual report, an amendment or an 8-K recast changed an
+    # earlier reported value of that concept. Values on either side of such a date may be on
+    # different bases and must not be combined. A 10-Q that re-reports last year's quarter on
+    # the basis a 10-K already set is catching up, not starting a new basis, so it does not
+    # count. Known gap: a basis change first made in a 10-Q is not detected.
+    restated_on: dict[str, set[str]] = field(default_factory=dict)
+
+    def mixes_bases(self, facts: list[Fact]) -> bool:
+        """True when ``facts`` straddle a restatement of their concept."""
+        by_concept: dict[str, list[str]] = defaultdict(list)
+        for f in facts:
+            by_concept[f.concept].append(f.published_at)
+        for concept, pubs in by_concept.items():
+            lo, hi = min(pubs), max(pubs)
+            if any(lo < r <= hi for r in self.restated_on.get(concept, ())):
+                return True
+        return False
 
     def get(self, concept: str, period_start: str | None, period_end: str, unit: str = "USD") -> Fact | None:
         return self.facts.get((concept, unit, period_start, period_end))
@@ -36,12 +56,19 @@ def visible(facts: list[Fact], as_of: str) -> list[Fact]:
     return [f for f in facts if f.published_at <= as_of]
 
 
-def snapshot(facts: list[Fact], as_of: str) -> Snapshot:
+def snapshot(facts: list[Fact], as_of: str, exclude: set[tuple] | None = None) -> Snapshot:
+    """``exclude``: (document_id, key) pairs dropped beforehand, e.g. ``quality.screen`` output."""
     snap = Snapshot(as_of)
     by_key: dict[tuple, list[Fact]] = defaultdict(list)
     for f in visible(facts, as_of):
+        if exclude and (f.document_id, f.key) in exclude:
+            continue
         by_key[f.key].append(f)
     for key, fs in by_key.items():
+        ordered = sorted(fs, key=lambda f: (f.published_at, f.document_id))
+        for prev, f in zip(ordered, ordered[1:]):
+            if f.value != prev.value and f.published_at != prev.published_at and f.form in BASIS_CHANGING_FORMS:
+                snap.restated_on.setdefault(key[0], set()).add(f.published_at)
         latest_day = max(f.published_at for f in fs)
         same_day = sorted((f for f in fs if f.published_at == latest_day), key=lambda f: f.document_id)
         snap.facts[key] = same_day[-1]

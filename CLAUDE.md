@@ -12,7 +12,8 @@
 
 - 계획·미정 사항: `PLANS.md`. P0 결과: `docs/p0_findings.md`. 외부 자원 출처: `SOURCES.md`
 - 테스트: `python -m pytest -q` (네트워크·API 키 불필요, `tests/fakes.py`의 가짜 HTTP 사용)
-- SEC 기준일 복원 점검: `python scripts/p0_check.py AES 2023-06-30 2025-06-30` (`SEC_USER_AGENT` 필요)
+- SEC 기준일 복원 점검: `python scripts/p0_check.py AES 2023-06-30 2025-06-30`, 지표·역산 점검: `python scripts/p1_check.py AMT --as-of 2025-06-30` (`SEC_USER_AGENT` 필요)
+- 데이터 품질 규칙(의심 값, 부호 오류, 재작성 혼합 금지)은 `docs/p1_findings.md`. 원문 값을 고치지 않고 제외하며 사유를 Unknown으로 남긴다.
 - 기준일 T 분석에는 `published_at <= T`인 값만 쓴다(`riskprobe/pit.py`). 정정 값은 덮어쓰지 않고 버전으로 남긴다.
 - 숫자·날짜·판정은 코드가 하고, LLM은 문장 추출·분해·해석에만 쓴다. 확률을 만들지 않는다.
 - 소스 결과는 값과 함께 근거(Evidence)와 한계(Unknown)를 반환한다. Unknown.message에는 숫자를 쓰지 않는다(LLM 입력용).

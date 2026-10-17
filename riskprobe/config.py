@@ -39,3 +39,10 @@ HTTP_CACHE_TTL_HOURS = float(os.environ.get("RISKPROBE_HTTP_CACHE_TTL_HOURS", "2
 SECRET_PARAMS = ("crtfc_key",)
 # SEC asks for at most ten requests per second.
 MIN_INTERVAL_SEC = {"www.sec.gov": 0.12, "data.sec.gov": 0.12}
+
+# Default rules (PLANS.md 2.4, 7.1). Used only when neither the user nor a filing gives a
+# threshold, always labeled "기본 규칙" with the source, and changeable by the user.
+# Thresholds: indicator -> floor (coverage) or cap (leverage).
+DEFAULT_THRESHOLDS = {"interest_coverage": 2.0, "net_debt_to_ebitda": 5.0}
+# Headroom grade: a shock smaller than this (but above zero) is "근접".
+HEADROOM_NEAR = {"%": 15.0, "bp": 100.0}
