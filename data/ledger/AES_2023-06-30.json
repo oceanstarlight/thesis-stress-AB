@@ -1,0 +1,83 @@
+{
+  "entity": "AES",
+  "name": "AES CORP",
+  "created_at": "2026-10-17T11:59:11Z",
+  "assumptions": [
+    {
+      "id": "A1",
+      "statement": "이자보상배율이 기준 이상으로 유지된다 (기본 규칙)",
+      "type": "financial",
+      "indicator": "interest_coverage",
+      "direction": "above",
+      "threshold": {
+        "value": 2.0,
+        "source": "default_rule",
+        "note": "기본 규칙: interest_coverage (보편 범위 내 값: 유지 약정 이자보상배율 최저 약 2~3배, 레버리지 최고 약 4~6배, S&P 재무위험 매트릭스 최고 레버리지 구간 5배 초과, 미국 레버리지 대출 지침 6배 초과 주의)"
+      },
+      "path_template": "ebitda_drop_to_coverage",
+      "horizon": "",
+      "source_quote": "",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/874761/000087476123000010/aes-20221231.htm",
+      "recorded_at": "2023-06-30",
+      "user_confirmed": false,
+      "history": []
+    },
+    {
+      "id": "A2",
+      "statement": "금리가 올라도 이자보상배율이 기준 이상으로 유지된다 (기본 규칙)",
+      "type": "financial",
+      "indicator": "interest_coverage",
+      "direction": "above",
+      "threshold": {
+        "value": 2.0,
+        "source": "default_rule",
+        "note": "기본 규칙: interest_coverage (보편 범위 내 값: 유지 약정 이자보상배율 최저 약 2~3배, 레버리지 최고 약 4~6배, S&P 재무위험 매트릭스 최고 레버리지 구간 5배 초과, 미국 레버리지 대출 지침 6배 초과 주의)"
+      },
+      "path_template": "rate_rise_to_coverage",
+      "horizon": "",
+      "source_quote": "",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/874761/000087476123000010/aes-20221231.htm",
+      "recorded_at": "2023-06-30",
+      "user_confirmed": false,
+      "history": []
+    },
+    {
+      "id": "A3",
+      "statement": "순차입금/EBITDA가 기준 이하로 유지된다 (기본 규칙)",
+      "type": "financial",
+      "indicator": "net_debt_to_ebitda",
+      "direction": "below",
+      "threshold": {
+        "value": 5.0,
+        "source": "default_rule",
+        "note": "기본 규칙: net_debt_to_ebitda (보편 범위 내 값: 유지 약정 이자보상배율 최저 약 2~3배, 레버리지 최고 약 4~6배, S&P 재무위험 매트릭스 최고 레버리지 구간 5배 초과, 미국 레버리지 대출 지침 6배 초과 주의)"
+      },
+      "path_template": "ebitda_drop_to_leverage",
+      "horizon": "",
+      "source_quote": "",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/874761/000087476123000010/aes-20221231.htm",
+      "recorded_at": "2023-06-30",
+      "user_confirmed": false,
+      "history": []
+    },
+    {
+      "id": "A4",
+      "statement": "순차입금/EBITDA가 기준 이하로 유지된다 (공시 약정 (정의 차이 주의))",
+      "type": "financial",
+      "indicator": "net_debt_to_ebitda",
+      "direction": "below",
+      "threshold": {
+        "value": 5.75,
+        "source": "disclosed",
+        "note": "revolving credit facility: The revolving credit facility also contains one financial covenant, evaluated quarterly, requiring the Company to maintain a maximum ratio of recourse debt to adjusted operating cash flow of 5.75 times."
+      },
+      "path_template": "ebitda_drop_to_leverage",
+      "horizon": "",
+      "source_quote": "",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/874761/000087476123000010/aes-20221231.htm",
+      "recorded_at": "2023-06-30",
+      "user_confirmed": false,
+      "history": []
+    }
+  ]
+}
