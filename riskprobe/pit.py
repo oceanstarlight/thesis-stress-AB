@@ -11,10 +11,10 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass, field
 
+from riskprobe import forms
 from riskprobe.models import Fact, Unknown
 
-
-BASIS_CHANGING_FORMS = {"10-K", "10-K/A", "10-Q/A", "8-K", "8-K/A", "20-F", "40-F"}
+BASIS_CHANGING_FORMS = forms.BASIS_CHANGING
 
 
 @dataclass

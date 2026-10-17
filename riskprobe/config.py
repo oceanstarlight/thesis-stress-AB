@@ -40,6 +40,16 @@ SECRET_PARAMS = ("crtfc_key",)
 # SEC asks for at most ten requests per second.
 MIN_INTERVAL_SEC = {"www.sec.gov": 0.12, "data.sec.gov": 0.12}
 
+# DART (Korea). Financial statements per report come from the single-company full-statement
+# API; each call takes seconds, so reports are fetched in parallel and only from this many
+# years before the analysis date. Listed companies are bundled in data/dart_corps.json
+# (scripts/build_dart_index.py) because the full corp code file is slow to download.
+DART_YEARS_BEFORE = 3
+DART_WORKERS = 6
+DART_FINANCIAL_TTL_HOURS = 24 * 7
+DART_CORPCODE_TTL_HOURS = 24 * 30
+DART_INDEX = DATA_DIR / "dart_corps.json"
+
 # Default rules (PLANS.md 2.4, 7.1). Used only when neither the user nor a filing gives a
 # threshold, always labeled "기본 규칙" with the source, and changeable by the user.
 # There is no single market standard (docs/p1_findings.md). The values sit inside commonly

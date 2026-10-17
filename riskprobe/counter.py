@@ -74,7 +74,7 @@ def find(book: indicators.Book, now: dict[str, indicators.Indicator], prev: dict
 
     for ev in recent_events:
         if ev.severity in ("high", "medium"):
-            out.append(Counter("event", f"최근 1년 수시공시: {', '.join(ev.labels)}", f"{ev.date} 8-K ({ev.severity})", [ev.filing.url]))
+            out.append(Counter("event", f"최근 1년 수시공시: {', '.join(ev.labels)}", f"{ev.date} {ev.filing.form} ({ev.severity})", [ev.filing.url]))
 
     for v in (extraction.of("risk") if extraction else []):
         if v.item.category in ("liquidity", "covenant", "credit_rating", "refinancing"):

@@ -46,10 +46,11 @@ class Candidate:
     ticker: str  # first listed ticker (usually the common share)
     title: str
     tickers: list[str] = field(default_factory=list)
+    market: str = "미국 SEC"
 
     @property
     def label(self) -> str:
-        return f"{self.title} ({', '.join(self.tickers[:3])})"
+        return f"{self.title} ({', '.join(self.tickers[:3])} · {self.market})"
 
 
 # Sectors where the debt-service indicators (EBITDA coverage, net debt/EBITDA) do not describe risk.
@@ -91,8 +92,9 @@ class Filing:
     filing_date: str
     accepted_at: str  # ISO-8601 acceptance time, may be empty
     report_date: str
-    items: str  # 8-K item numbers, e.g. "2.02,9.01"
+    items: str  # 8-K item numbers, e.g. "2.02,9.01" (DART: the SEC-equivalent item of a tagged title)
     url: str
+    title: str = ""  # DART report name, e.g. "[기재정정]사업보고서 (2023.12)"
 
 
 @dataclass
@@ -202,8 +204,9 @@ class SecSource:
                                         FILING_INDEX.format(cik=int(cik), acc=acc.replace("-", ""))))
         return out, d.get("entityName", "")
 
-    def load(self, query: str) -> SecResult:
-        """Facts and filings for a ticker or CIK. Never raises; failures become unknowns."""
+    def load(self, query: str, since: str | None = None) -> SecResult:
+        """Facts and filings for a ticker, CIK or name. Never raises; failures become unknowns.
+        ``since`` is accepted for parity with DART; companyfacts comes whole in one call."""
         res = SecResult()
         ok, reason = self.available()
         if not ok:

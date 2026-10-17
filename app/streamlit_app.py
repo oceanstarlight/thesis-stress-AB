@@ -30,6 +30,7 @@ from riskprobe import (  # noqa: E402
 )
 from riskprobe.http import Http  # noqa: E402
 from riskprobe.ledger import Ledger  # noqa: E402
+from riskprobe.sources import market  # noqa: E402
 from riskprobe.sources.sec import SecSource  # noqa: E402
 
 st.set_page_config(page_title="RiskProbe", layout="wide")
@@ -76,8 +77,8 @@ def run_audit(ledger_json: str, end: str) -> tuple[str, list[dict]]:
 
 @st.cache_data(show_spinner=False, ttl=6 * 3600)
 def guidance_ledger(query: str, as_of: str) -> str:
-    src = SecSource(http())
-    data = src.load(query)
+    src = market.source_for(query, http())
+    data = src.load(query, since=market.since_for(as_of))
     targets, _ = guidance.latest_before(src, data.filings, as_of)
     lg = Ledger(query, data.name)
     for a in guidance.to_assumptions(targets, as_of):
@@ -87,12 +88,9 @@ def guidance_ledger(query: str, as_of: str) -> str:
 
 @st.cache_data(show_spinner=False, ttl=24 * 3600)
 def search_companies(query: str) -> list[tuple[str, str]]:
-    """(CIK, label) candidates for a name, ticker or CIK."""
-    src = SecSource(http())
-    if not src.available()[0]:
-        return []
+    """(query id, label) candidates: SEC CIK or KR:<stock code>."""
     try:
-        return [(c.cik, c.label) for c in src.search(query, limit=10)]
+        return [(c.cik, c.label) for c in market.search(query, http(), limit=10)]
     except Exception:  # noqa: BLE001 - no User-Agent or network: fall back to the raw input
         return []
 
@@ -110,8 +108,8 @@ def company_warnings(cik: str) -> list[str]:
 
 def company_picker(container, key: str) -> str:
     """Name/ticker/CIK box plus a candidate list; returns the CIK to run (or the raw input)."""
-    q = container.text_input("회사 이름 · 종목코드 · CIK (미국 상장사)", key=key,
-                             help="예: alphabet, hawaiian electric, AES, 1603145. 입력 후 Enter를 누르면 후보가 뜬다.")
+    q = container.text_input("회사 이름 · 종목코드 · CIK (미국 SEC · 한국 DART)", key=key,
+                             help="예: alphabet, hawaiian electric, AES, 1603145, 대한항공, 015760. 입력 후 Enter를 누르면 후보가 뜬다.")
     found = search_companies(q.strip()) if q.strip() else []
     if not found:
         if q.strip():
@@ -133,6 +131,8 @@ def sidebar() -> None:
                        "나중에 왜 틀렸는지 감사한다(Audit).")
     ua = config.env("SEC_USER_AGENT")
     st.sidebar.markdown(f"{'🟢' if ua and '@' in ua else '🔴'} SEC EDGAR (User-Agent)")
+    st.sidebar.markdown(f"{'🟢' if config.env('DART_API_KEY') else '⚪'} DART (한국 기업)")
+    st.sidebar.markdown(f"{'🟢' if config.env('ECOS_API_KEY') else '⚪'} 한국은행 ECOS (한국 금리 경로)")
     p = llm.provider()
     st.sidebar.markdown(f"{'🟢' if p != 'none' else '⚪'} LLM: {p if p != 'none' else '없음 (공시 추출·해석 생략)'}")
     st.sidebar.divider()
@@ -221,7 +221,7 @@ def run_watch(names: tuple[str, ...], since: str, until: str, rate_bp: float, eb
 
 def watch_tab() -> None:
     st.subheader("Watch: 보유 중 무엇이 바뀌었고, 어느 가정이 깨지는 쪽으로 가까워졌는가")
-    st.caption("새 정기공시로 가정 재평가, 경고성 수시공시(8-K), 금리(SOFR·국채 10년물) 변화를 코드 규칙으로 확인한다. "
+    st.caption("새 정기공시로 가정 재평가, 경고성 수시공시(8-K·주요사항보고서), 금리(SOFR·미 국채 10년 / CD 91일·국고채 3년) 변화를 코드 규칙으로 확인한다. "
                "평일 매일 GitHub Actions로도 돌고, 새 경보는 GitHub Issue로 온다.")
     wl_path = config.DATA_DIR / "watchlist.json"
     default = json.loads(wl_path.read_text(encoding="utf-8")) if wl_path.exists() else []
@@ -243,6 +243,8 @@ REVIEW_DEMOS = {  # label: (ticker or CIK, T0, check date, include guidance)
     "XPLR: 회사 전망 포함 → 2025": ("1603145", "2023-06-30", "2025-06-30", True),
     "AES: 2023 판단 → 2025": ("AES", "2023-06-30", "2025-06-30", False),
     "AMT: 투자 전 검토 (2025-06)": ("AMT", "2025-06-30", "2025-06-30", False),
+    "한국전력: 적자 중 판단 → 2025": ("KR:015760", "2023-06-30", "2025-06-30", False),
+    "대한항공: 2023 판단 → 2025": ("KR:003490", "2023-06-30", "2025-06-30", False),
 }
 
 

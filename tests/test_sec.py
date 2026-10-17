@@ -69,7 +69,7 @@ def test_search_by_name_ticker_and_cik(monkeypatch):
     src = sec.SecSource(names_http())
     found = src.search("alphabet")
     assert [c.cik for c in found] == ["0001652044", "0000000077"]  # one row per company, exact name first
-    assert found[0].tickers == ["GOOGL", "GOOG"] and found[0].label == "Alphabet Inc. (GOOGL, GOOG)"
+    assert found[0].tickers == ["GOOGL", "GOOG"] and found[0].label == "Alphabet Inc. (GOOGL, GOOG · 미국 SEC)"
     assert src.search("Hawaiian Electric")[0].ticker == "HE"
     assert src.search("jp morgan")[0].ticker == "JPM"
     assert src.search("goog")[0].ticker == "GOOGL"  # exact ticker beats name prefix

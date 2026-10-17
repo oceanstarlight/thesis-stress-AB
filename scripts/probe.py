@@ -33,7 +33,7 @@ def main() -> int:
             "interest_coverage": a.coverage_floor, "net_debt_to_ebitda": a.leverage_cap}
     res = probe.run(a.company, a.as_of, Http(), {k: v for k, v in user.items() if v is not None})
     md = report.render(res, use_llm=not a.no_llm_summary)
-    tag = f"{a.company.upper()}_{a.as_of}"
+    tag = f"{a.company.upper().replace(':', '-')}_{a.as_of}"
     out = config.ROOT / "reports" / f"probe_{tag}.md"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(md, encoding="utf-8")

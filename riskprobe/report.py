@@ -28,19 +28,22 @@ _FORBIDDEN = re.compile(r"확률|가능성이\s*(?:높|낮)|매수|매도|목표
 GRADE_ORDER = {"초과": 0, "근접": 1, "여유 충분": 2, "": 3}
 
 
-def money(v: float | None) -> str:
+def money(v: float | None, currency: str = "USD") -> str:
     if v is None:
         return "-"
     a = abs(v)
-    s = f"${a / 1e9:,.2f}B" if a >= 1e9 else f"${a / 1e6:,.0f}M"
+    if currency == "KRW":
+        s = f"{a / 1e12:,.2f}조원" if a >= 1e12 else f"{a / 1e8:,.0f}억원"
+    else:
+        s = f"${a / 1e9:,.2f}B" if a >= 1e9 else f"${a / 1e6:,.0f}M"
     return f"-{s}" if v < 0 else s
 
 
 def num(v: float | None, unit: str) -> str:
     if v is None:
         return "-"
-    if unit == "USD":
-        return money(v)
+    if unit in ("USD", "KRW"):
+        return money(v, unit)
     if unit == "x":
         return f"{v:,.2f}배"
     if unit in ("%", "%p"):
@@ -140,7 +143,8 @@ def llm_reading(res: ProbeResult) -> tuple[Reading | None, str]:
 
 
 # Input-level limits shown on top: the indicators may not describe this company.
-WARN_CODES = ("sec_foreign_filer", "sec_no_periodic", "sec_financial_sector")
+WARN_CODES = ("sec_foreign_filer", "sec_no_periodic", "sec_financial_sector", "dart_financial_sector",
+              "indicator_ebit_basis")
 
 
 def render(res: ProbeResult, use_llm: bool = True) -> str:

@@ -19,7 +19,8 @@ Verdict (shown with every component; a score, not a probability):
 - Total >= review threshold -> 재검토 필요, >= caution threshold -> 주의, else 유지; any
   breached assumption is at least 주의.
 - Hard rules, regardless of score: EBITDA <= 0 at the check date, or an 8-K item 1.03 / 2.04 /
-  4.02 in the last year -> 재검토 필요.
+  4.02 in the last year (DART: a current-report title mapped to 1.03 or 2.04, see
+  sources.dart.EVENT_RULES) -> 재검토 필요.
 Weights live in config.VERDICT_SCORE.
 """
 
@@ -30,16 +31,15 @@ from datetime import date, timedelta
 
 from riskprobe import audit, config, events, guidance, indicators, probe, quality, reverse, watch
 from riskprobe.models import Unknown
-from riskprobe.sources import rates
-from riskprobe.sources.sec import SecSource
+from riskprobe.sources import market, rates
 
 RECENT_ALERT_DAYS = 90
 _W = config.VERDICT_SCORE
 VERDICT_RULES = (f"가정 점수(기준 초과 정도 1~3점 × 기준값 출처 가중, 기준일 대비 악화 +{_W['worse_since_t0']:g}, "
                  f"기준일부터 초과·악화 없음 ×{_W['known_at_t0_factor']:g}, 혼합 {_W['mixed']:g}, 근접 {_W['near']:g}) + "
-                 f"최근 90일 8-K(고 {_W['event_high']:g}, 중 {_W['event_medium']:g}, 최대 {_W['event_cap']:g}) + "
+                 f"최근 90일 수시공시(고 {_W['event_high']:g}, 중 {_W['event_medium']:g}, 최대 {_W['event_cap']:g}) + "
                  f"시나리오 {_W['scenario']:g}. 합계 {_W['review']:g} 이상 재검토 필요, {_W['caution']:g} 이상 주의(기준 초과 가정이 "
-                 f"있으면 최소 주의). 강제 규칙: EBITDA ≤ 0, 최근 1년 8-K 파산·조기상환 사유·재작성 → 재검토 필요. "
+                 f"있으면 최소 주의). 강제 규칙: EBITDA ≤ 0, 최근 1년 수시공시 파산·회생·조기상환 사유·재작성 → 재검토 필요. "
                  f"점수는 확률이 아님")
 
 
@@ -108,9 +108,12 @@ def run(query: str, t0: str, end: str, http, user: dict | None = None, include_g
         out.verdict, out.reasons = "판단 불가", ["기준일까지 공개된 재무 값이 없음"]
         return out
 
-    src = SecSource(http)
-    if include_guidance:
-        data = src.load(query)
+    src = market.source_for(query, http)
+    since = market.since_for(t0)
+    if include_guidance and market.is_kr(query):
+        out.unknowns.append(Unknown("guidance_kr_unsupported", "한국 기업의 회사 전망(공정공시) 추출은 아직 지원하지 않음"))
+    elif include_guidance:
+        data = src.load(query, since=since)
         targets, g_unknowns = guidance.latest_before(src, data.filings, t0)
         out.unknowns += g_unknowns
         for a in guidance.to_assumptions(targets, t0, start_id=1):
@@ -135,20 +138,22 @@ def run(query: str, t0: str, end: str, http, user: dict | None = None, include_g
     rate_left: dict[str, tuple[float | None, str]] = {}
     rate_paths = [a for a in lg.assumptions if a.path_template == "rate_rise_to_coverage"]
     if rate_paths and end > t0:
-        sofr, r_unknowns = rates.fetch(http, "sofr", indicators._one_year_before(t0), end)
+        key = market.floating_rate(query)
+        series, r_unknowns = rates.fetch(http, key, indicators._one_year_before(t0), end)
         out.unknowns += r_unknowns
-        if sofr is not None:
-            mv = sofr.change_bp(t0, end)
+        if series is not None:
+            mv = series.change_bp(t0, end)
             if mv:
-                out.rate_moves["sofr"] = mv
-        data = src.load(query)
+                out.rate_moves[key] = mv
+        data = src.load(query, since=since)
         excluded, _ = quality.screen(data.facts, {f.accession: f.report_date for f in data.filings})
         book = watch._book(data.facts, excluded, end)
         for a in rate_paths:
-            rate_left[a.id] = watch._rate_headroom(a, book, out.rate_moves["sofr"][0] if "sofr" in out.rate_moves else None)
+            rate_left[a.id] = watch._rate_headroom(a, book, out.rate_moves[key][0] if key in out.rate_moves else None,
+                                                   rates.LABELS[key])
 
     if out.audit is None:
-        data = src.load(query)
+        data = src.load(query, since=since)
         out.events, ev_u = events.scan(src, data.filings, indicators._one_year_before(end), end)
         out.unknowns += ev_u
     else:
@@ -274,7 +279,7 @@ def _verdict(out: LifecycleResult) -> None:
     for e in evs:
         if e.date > recent_cut and e.severity in ("high", "medium"):
             ev_pts += _W["event_high"] if e.severity == "high" else _W["event_medium"]
-            out.score_notes.append(f"최근 90일 8-K {e.date} {', '.join(e.labels)} ({e.severity})")
+            out.score_notes.append(f"최근 90일 {e.filing.form} {e.date} {', '.join(e.labels)} ({e.severity})")
     ev_pts = min(ev_pts, _W["event_cap"])
     holding_ids = {r.id for r in out.rows if r.status_now == "supported"}
     scen_break = [s for s in out.scenario if s.verdict == "초과" and s.assumption in holding_ids]
@@ -288,7 +293,8 @@ def _verdict(out: LifecycleResult) -> None:
         items = {i.strip() for i in (e.filing.items or "").split(",")}
         for item, label in config.VERDICT_HARD_8K_ITEMS.items():
             if item in items and e.date > hard_cut:
-                hard.append(f"{e.date} 8-K {item} {label}")
+                hard.append(f"{e.date} {e.filing.form} {item} {label}" if e.filing.form.startswith("8-K")
+                            else f"{e.date} {e.filing.form} {', '.join(e.labels)}")
     breached = any(r.status_now == "weakened" for r in out.rows)
     if hard:
         out.verdict = "재검토 필요"

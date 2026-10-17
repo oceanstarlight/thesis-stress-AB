@@ -7,7 +7,8 @@
 | SEC EDGAR (`data.sec.gov` submissions, companyfacts; `www.sec.gov` company_tickers, Archives) | 미국 상장사 공시 목록·XBRL 재무값·원문 링크 | 공개 데이터, 키 불필요. 연락처가 담긴 User-Agent 필수, 초당 10건 이하 (https://www.sec.gov/os/accessing-edgar-data) | 요청 간격 0.12초로 제한 |
 | 뉴욕 연준 Reference Rates API (SOFR) | Watch 금리 트리거, 금리 경로 재계산 | 공개 데이터, 키 불필요 (https://markets.newyorkfed.org/static/docs/markets-api.html) | |
 | 연준 H.15 Selected Interest Rates (국채 10년물) | Watch 금리 트리거 | 미국 정부 공공 데이터, 출처 표기 (https://www.federalreserve.gov/releases/h15/) | 연준 Data Download Program |
-| OpenDART (금융감독원) | 한국 상장사 공시 목록·재무제표·원본 XBRL | 무료 API 키, 일 20,000건 (https://opendart.fss.or.kr) | P0에서 원본 XBRL 다운로드 확인 |
+| OpenDART (금융감독원) | 한국 상장사 목록(`corpCode.xml` → `data/dart_corps.json`), 공시 목록(`list.json`), 기업 개황(`company.json`), 보고서별 재무제표(`fnlttSinglAcntAll.json`) | 무료 API 키, 일 20,000건 (https://opendart.fss.or.kr) | P0에서 원본 XBRL 다운로드 확인. 지금은 보고서별 재무 API(정정 후 값, 정정일 기준)만 사용 |
+| 한국은행 ECOS (시장금리 일별 817Y002) | 한국 기업 금리 경로: CD 91일(010502000), 국고채 3년(010200000) | 무료 API 키 (https://ecos.bok.or.kr/api) | 키가 없으면 한국 금리 경로 생략 |
 
 ## 기본 규칙 기준값 참고 자료 (`docs/p1_findings.md`)
 
