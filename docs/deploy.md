@@ -25,6 +25,10 @@
 - 필요한 설정: 저장소 Settings → Secrets and variables → Actions → **`SEC_USER_AGENT`** 추가. LLM 키는 필요 없다.
 - 마지막 실행일은 Actions 캐시(`watch_state/state.json`)에 저장돼 다음 실행이 그 이후만 본다. 수동 실행: Actions → watch → Run workflow.
 
+## 병합 후 앱 오류가 나면
+
+새 코드를 병합하면 Streamlit Cloud가 파일만 바꾸고 이미 메모리에 올라간 일부 모듈은 예전 것을 계속 쓸 수 있다. 이때 로컬에서는 안 나는 `AttributeError` 같은 오류가 난다. **Manage app → ⋮ → Reboot app**으로 다시 시작하면 해결된다.
+
 ## 운영 메모
 
 - 첫 실행은 SEC 데이터(기업별 companyfacts 수 MB, 10-K 원문 수 MB)를 받느라 기업당 수십 초 걸린다. 같은 입력은 앱 캐시(6시간)와 디스크 HTTP 캐시(24시간)로 다시 받지 않는다.
