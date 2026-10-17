@@ -113,7 +113,7 @@ def test_event_before_financial_warning(monkeypatch):
     ev = [e for e in res.events if e.filing.accession == acc][0]
     assert ev.severity == "high" and "재해·사고" in ev.labels and "wildfire" in ev.matched[0]
     md = audit_report.render(res)
-    assert "일 먼저" in md
+    assert "일 먼저" in md and "가정의 첫 경고" in md
 
 
 def test_event_item_rules():

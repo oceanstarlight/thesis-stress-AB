@@ -11,6 +11,10 @@ STATE_KO = {"supported": "유지", "weakened": "약화", "mixed": "혼합(공시
 UNIT = {"interest_coverage": "x", "net_debt_to_ebitda": "x"}
 
 
+def _unit(indicator: str) -> str:
+    return "%" if indicator.startswith("guidance:") else UNIT.get(indicator, "x")
+
+
 def render(res: AuditResult) -> str:
     L = [f"# 투자 판단 감사 보고서: {res.name or res.entity}", "",
          f"- 판단 기준일(T0): {res.t0} · 재생 종료일: {res.end}",
@@ -23,7 +27,7 @@ def render(res: AuditResult) -> str:
         base = aa.evaluations[0] if aa.evaluations else None
         fw = f"{aa.first_warning.date} ({aa.first_warning.filing.form if aa.first_warning.filing else '기준일 스냅샷'})" if aa.first_warning else "-"
         fragile = {True: "있음", False: "없음", None: "판단 불가"}[aa.fragile]
-        th = f"{num(a.threshold.value, 'x')} {'이상' if a.direction == 'above' else '이하'} ({a.threshold.source})" if a.threshold else "-"
+        th = f"{num(a.threshold.value, _unit(a.indicator))} {'이상' if a.direction == 'above' else '이하'} ({a.threshold.source})" if a.threshold else "-"
         L.append(f"| {a.id} {a.statement} | {th} | {STATE_KO.get(base.status, '-') if base else '-'} | {fw} | **{aa.failure_type}** | {fragile} |")
     L.append("")
     for aa in res.audits:
@@ -33,13 +37,23 @@ def render(res: AuditResult) -> str:
     L += ["## 2. 시간순 재생", ""]
     for aa in res.audits:
         a = aa.assumption
+        if a.indicator.startswith("guidance:"):
+            L += [f"### {a.id} {a.statement}", "", f"> {a.source_quote}", "",
+                  "| 공개일 | 공시 | 다시 말한 전망 하단 | 상태 |", "|---|---|---|---|"]
+            for e in aa.evaluations:
+                src = "기준일 기록" if e.is_baseline else f"[{e.filing.form} {e.filing.items}]({e.filing.url})"
+                mark = " ⚠" if aa.first_warning is e else ""
+                st = "전망 미언급" if e.status == "insufficient" else STATE_KO[e.status]
+                L.append(f"| {e.date} | {src} | {num(e.value, '%')} | {st}{mark} |")
+            L.append("")
+            continue
         L += [f"### {a.id} {a.statement}", "", "| 공개일 | 공시 | 재무 기준 기간 말 | 값(공시 EBITDA) | 값(조정 EBITDA) | 상태 |", "|---|---|---|---|---|---|"]
         for e in aa.evaluations:
             src = "기준일 스냅샷" if e.is_baseline else f"[{e.filing.form}]({e.filing.url})"
             mark = " ⚠" if aa.first_warning is e else ""
-            val = "EBITDA ≤ 0" if e.value is None and e.status in ("weakened", "mixed") else num(e.value, UNIT.get(a.indicator, 'x'))
+            val = "EBITDA ≤ 0" if e.value is None and e.status in ("weakened", "mixed") else num(e.value, _unit(a.indicator))
             L.append(f"| {e.date} | {src} | {e.period_end} | {val} | "
-                     f"{num(e.value_adjusted, UNIT.get(a.indicator, 'x'))} | {STATE_KO[e.status]}{mark} |")
+                     f"{num(e.value_adjusted, _unit(a.indicator))} | {STATE_KO[e.status]}{mark} |")
         L.append("")
 
     L += ["## 3. 같은 기간의 수시공시 (규칙 분류, 원인 단정 아님)", "", "| 공개일 | T0 대비 | 분류 | 중요도 | 원문 |", "|---|---|---|---|---|"]
@@ -60,8 +74,8 @@ def render(res: AuditResult) -> str:
         line = f"- 기준일 이후 첫 고위험 수시공시: **{first_event.date}** ({', '.join(first_event.labels)})"
         if first_fin:
             gap = (date.fromisoformat(first_fin) - date.fromisoformat(first_event.date)).days
-            line += (f". 재무 지표의 첫 경고({first_fin})보다 **{gap}일 먼저** 공개됨" if gap > 0
-                     else f". 재무 지표의 첫 경고({first_fin})와 같은 시기이거나 그 뒤")
+            line += (f". 가정의 첫 경고({first_fin})보다 **{gap}일 먼저** 공개됨" if gap > 0
+                     else f". 가정의 첫 경고({first_fin})와 같은 시기이거나 그 뒤")
         L.append(line)
     alerts_before = [e for e in res.events if e.date <= res.t0 and e.severity in ("high", "medium")]
     alerts_after = [e for e in res.events if e.date > res.t0 and e.severity in ("high", "medium")]

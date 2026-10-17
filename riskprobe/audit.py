@@ -24,7 +24,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date
 
-from riskprobe import events, indicators, pit, quality, reverse
+from riskprobe import events, guidance, indicators, pit, quality, reverse
 from riskprobe.ledger import Assumption, Ledger, StatusEntry
 from riskprobe.models import Unknown
 from riskprobe.sources.sec import Filing, SecSource
@@ -157,13 +157,14 @@ def run(ledger: Ledger, end: str, http) -> AuditResult:
     out.unknowns += q_unknowns
 
     dates = [(t0, None)] + [(f.filing_date, f) for f in data.filings if f.form in PERIODIC and t0 < f.filing_date <= end]
-    quant = [a for a in ledger.assumptions if a.indicator and a.threshold is not None
+    guided = [a for a in ledger.assumptions if a.indicator.startswith("guidance:") and a.threshold is not None]
+    quant = [a for a in ledger.assumptions if a.indicator and a.threshold is not None and a not in guided
              and a.path_template != "rate_rise_to_coverage"]
     for a in ledger.assumptions:
         if a.path_template == "rate_rise_to_coverage":
             out.unknowns.append(Unknown("audit_rate_path_skipped",
                                         "금리 경로 가정은 재생에서 이자보상배율 가정과 같아 따로 판정하지 않음 (금리 변화는 Watch에서 판정)", a.id))
-        elif a not in quant:
+        elif a not in quant and a not in guided:
             out.unknowns.append(Unknown("audit_qualitative_skipped", "정량 지표가 없는 가정은 이번 재생에서 판정하지 않음", a.id))
     audits = {a.id: AssumptionAudit(a) for a in quant}
     last_anchor, t0_book = None, None
@@ -179,6 +180,13 @@ def run(ledger: Ledger, end: str, http) -> AuditResult:
         for a in quant:
             v, v_adj, st = _evaluate(a, ind)
             audits[a.id].evaluations.append(Evaluation(d, filing, anchor, v, v_adj, st, is_baseline=filing is None))
+
+    for a in guided:
+        aa = AssumptionAudit(a)
+        aa.evaluations.append(Evaluation(a.recorded_at, None, "-", a.threshold.value, None, "supported", is_baseline=True))
+        audits[a.id] = aa
+    if guided:
+        out.unknowns += _replay_guidance(src, data.filings, guided, audits, t0, end)
 
     out.events, ev_unknowns = events.scan(src, data.filings, _minus_year(t0), end)
     out.unknowns += ev_unknowns
@@ -196,6 +204,25 @@ def run(ledger: Ledger, end: str, http) -> AuditResult:
                                                      [e.filing.url] if e.filing else []))
     out.audits = list(audits.values())
     return out
+
+
+def _replay_guidance(src, filings: list[Filing], guided: list[Assumption], audits: dict[str, AssumptionAudit],
+                     t0: str, end: str) -> list[Unknown]:
+    """Restatements of each guided target in later earnings / Reg FD releases. A lower low end
+    than the recorded threshold is 'weakened'; an earnings release that no longer states the
+    target is 'insufficient' (the target was dropped or not repeated)."""
+    unknowns = []
+    for f in guidance.releases(src, filings, t0, end):
+        r = guidance.release_targets(src, f)
+        unknowns += r.unknowns
+        for a in guided:
+            hit = next((vt for vt in r.targets if guidance.same_measure(a, vt)), None)
+            if hit is not None:
+                st = "supported" if a.holds(hit.low) else "weakened"
+                audits[a.id].evaluations.append(Evaluation(f.filing_date, f, "-", hit.low, None, st))
+            elif "2.02" in (f.items or ""):
+                audits[a.id].evaluations.append(Evaluation(f.filing_date, f, "-", None, None, "insufficient"))
+    return unknowns
 
 
 def _fragility(aa: AssumptionAudit, t0_book: indicators.Book) -> None:

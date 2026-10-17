@@ -1,0 +1,26 @@
+{
+  "entity": "1603145",
+  "name": "XPLR Infrastructure, LP",
+  "created_at": "2026-10-17T12:04:10Z",
+  "assumptions": [
+    {
+      "id": "G1",
+      "statement": "limited partner distributions per unit 연 12%~15% 성장 (through at least 2026)",
+      "type": "guidance",
+      "indicator": "guidance:dividend_per_share",
+      "direction": "above",
+      "threshold": {
+        "value": 12.0,
+        "source": "disclosed",
+        "note": "Given NextEra Energy Partners' growth visibility, we continue to see 12% to 15% growth per year in limited partner distributions per unit as being a reasonable range of expectations through at least 2026."
+      },
+      "path_template": "",
+      "horizon": "through at least 2026",
+      "source_quote": "Given NextEra Energy Partners' growth visibility, we continue to see 12% to 15% growth per year in limited partner distributions per unit as being a reasonable range of expectations through at least 2026.",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1603145/000160314523000013/nep-20230425.htm",
+      "recorded_at": "2023-06-30",
+      "user_confirmed": false,
+      "history": []
+    }
+  ]
+}

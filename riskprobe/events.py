@@ -67,7 +67,7 @@ def tag(filing: Filing, doc_text: str = "") -> Event:
     return ev
 
 
-_EX99 = re.compile(r"(?:^|[-_.])(?:d?ex(?:hibit)?-?99[\w.-]*)\.(?:htm|html|txt)$", re.I)
+_EX99 = re.compile(r"ex(?:hibit)?[-_]?99[\w.-]*\.(?:htm|html|txt)$", re.I)
 MAX_EXHIBITS = 2
 
 
