@@ -33,4 +33,14 @@
 
 ## AI 모델·API
 
-아직 사용하지 않음 (P2부터 추가 예정).
+| 모델·API | 용도 | 비고 |
+|---|---|---|
+| Google Gemini API (`gemini-3.5-flash-lite`, 기본) | 연차보고서 발췌문에서 위험 요인·변동금리 차입금·금리 민감도·약정·고객 집중 추출, 보고서의 숫자 없는 해석 문장 | 결과는 원문 인용 검증·숫자 감사를 통과한 것만 사용. 같은 요청은 디스크 캐시로 재사용 |
+| Anthropic Claude API (`claude-haiku-5-5`, 선택) | 위와 같음 (Gemini 키가 없을 때) | |
+
+코드: `riskprobe/llm.py`는 `oceanstarlight/kr-fund-ai-agent` `sentinel/agents/llm.py`(→ `fund-reversing-ai` `tracer/llm.py`)에서, 원문 인용 검증 방식은 `fund-reversing-ai` `tracer/extract.py`에서, 숫자 감사(`audit`)는 `kr-fund-ai-agent` `audit_brief`에서 가져왔다.
+
+| 라이브러리 | 라이선스 |
+|---|---|
+| google-genai | Apache-2.0 |
+| anthropic | MIT |

@@ -14,9 +14,10 @@ cp .env.example .env   # SEC_USER_AGENT 등 입력
 python -m pytest -q    # 네트워크·키 불필요
 python scripts/p0_check.py AES 2023-06-30 2025-06-30   # SEC 기준일 복원 점검
 python scripts/p1_check.py AMT AES --as-of 2023-06-30 2025-06-30   # 지표·역산 점검
+python scripts/probe.py AES --as-of 2025-06-30   # Probe 위험 보고서 → reports/, 가정 원장 → data/ledger/
 ```
 
-## 현재 구현 (P0~P1)
+## 현재 구현 (P0~P2)
 
 | 구성 | 위치 | 내용 |
 |---|---|---|
@@ -27,3 +28,8 @@ python scripts/p1_check.py AMT AES --as-of 2023-06-30 2025-06-30   # 지표·역
 | 지표 카탈로그 | `riskprobe/indicators.py` | 대체 태그, 분기 환산, TTM, 지표 12개, 부호 오류·재작성 혼합 차단 |
 | 가정 원장 | `riskprobe/ledger.py` | 가정·기준값(출처)·상태 이력 |
 | 역산 엔진 | `riskprobe/reverse.py` | 경로 템플릿 4개, 위험 등급(확률 대신 남은 여유) |
+| LLM | `riskprobe/llm.py` | Gemini/Claude 구조화 호출, 캐시, 재시도. 키가 없으면 해당 단계만 생략 |
+| 공시 문단 선별 | `riskprobe/text.py` | 10-K HTML → 문단, 키워드로 약 1/10만 남김 |
+| 공시 추출 | `riskprobe/extract.py` | LLM 제안 → 원문 인용 확인 → 숫자는 코드가 파싱 |
+| Probe | `riskprobe/probe.py` | 기준일 데이터 → 추출 → 경로별 역산(공시/조정 EBITDA, 기본 규칙/공시 약정) → 가정 원장 |
+| 보고서 | `riskprobe/report.py` | 코드 판정 결론 + 숫자 없는 LLM 해석(감사) + 출처·한계 |

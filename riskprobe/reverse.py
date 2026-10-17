@@ -35,6 +35,7 @@ class ReverseResult:
     status: str = "computed"  # computed | breached | not_applicable | missing_input
     shock: float | None = None  # size of the adverse move that reaches the threshold
     current: float | None = None  # the indicator now, for display
+    beyond_cap: bool = False  # shock larger than any plausible move (config.RATE_SHOCK_CAP_BP)
     grade: str = ""  # 여유 충분 | 근접 | 초과 | ""
     inputs: dict[str, float] = field(default_factory=dict)
     evidence: list[Evidence] = field(default_factory=list)
@@ -129,7 +130,9 @@ def rate_rise_to_coverage(ebitda: Measured | float | None, interest: Measured | 
         r.unknowns.append(Unknown("reverse_not_applicable", "변동금리 차입금이 없어 금리 경로가 해당하지 않음"))
         return r
     r.current = e / i if i > 0 else None
-    return _finish(r, (e / floor.value - i) / fd * 10_000)
+    _finish(r, (e / floor.value - i) / fd * 10_000)
+    r.beyond_cap = r.shock > config.RATE_SHOCK_CAP_BP
+    return r
 
 
 def ebitda_drop_to_leverage(net_debt: Measured | float | None, ebitda: Measured | float | None,

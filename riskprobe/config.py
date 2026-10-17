@@ -53,3 +53,15 @@ DEFAULT_THRESHOLD_BASIS = ("보편 범위 내 값: 유지 약정 이자보상배
                            "S&P 재무위험 매트릭스 최고 레버리지 구간 5배 초과, 미국 레버리지 대출 지침 6배 초과 주의")
 # Headroom grade: a shock smaller than this (but above zero) is "근접".
 HEADROOM_NEAR = {"%": 15.0, "bp": 100.0}
+# A rate shock beyond this is shown as "insensitive" rather than as a literal figure.
+RATE_SHOCK_CAP_BP = 1_000.0
+
+# LLM (filing extraction and report wording only). Provider "auto" picks Gemini when a Google
+# key is set, then Anthropic, else none (everything still runs, without extraction).
+LLM_PROVIDER = os.environ.get("RISKPROBE_LLM_PROVIDER", "auto")  # auto | gemini | anthropic | none
+GEMINI_MODEL = os.environ.get("RISKPROBE_GEMINI_MODEL", "gemini-3.5-flash-lite")
+ANTHROPIC_MODEL = os.environ.get("RISKPROBE_ANTHROPIC_MODEL", "claude-haiku-5-5")
+LLM_CACHE = os.environ.get("RISKPROBE_LLM_CACHE", "1") != "0"
+LLM_CACHE_DIR = Path(os.environ.get("RISKPROBE_LLM_CACHE_DIR", DATA_DIR / "llm_cache"))
+# Filing text sent to the model: keyword-selected paragraphs up to this many characters.
+EXTRACT_MAX_CHARS = 120_000
