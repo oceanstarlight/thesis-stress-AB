@@ -38,6 +38,9 @@
     <span><i class="sw" style="background:var(--grp);border:2px dashed var(--line)"></i>병렬·다중 모듈 묶음</span>
   </div>
 
+  <div class="box ledger" style="margin-bottom:12px;font-size:18px"><b>입력 하나</b> — 기업 + 판단 기준일(T0) + 점검일 <span class="small">(T0 = 점검일이면 투자 전 검토, T0가 과거면 보유 점검 + 사후 감사)</span></div>
+  <div class="arrow" style="margin-top:-4px">↓</div>
+
   <!-- shared data layer -->
   <div class="data">
     <div class="grp"><div class="t">데이터 수집 (병렬)</div>
@@ -83,7 +86,7 @@
     </div>
 
     <!-- Watch -->
-    <div class="lane"><h2>Watch <small>보유 중 · 평일 매일</small></h2>
+    <div class="lane"><h2>Watch <small>보유 중 · 금리·시나리오</small></h2>
       <div class="grp"><div class="t">트리거 (병렬)</div>
         <div class="row"><div class="box code">새 정기공시</div><div class="box code">8-K 규칙<br><span class="small">재해·소송·배당</span></div><div class="box code">금리<br>±25bp</div></div>
       </div>
@@ -97,7 +100,7 @@
     </div>
 
     <!-- Audit -->
-    <div class="lane"><h2>Audit <small>투자 후</small></h2>
+    <div class="lane"><h2>Audit <small>투자 후 · 재생은 한 번만</small></h2>
       <div class="box ledger">원장 기록 시점 (T0)</div>
       <div class="arrow">↓</div>
       <div class="grp"><div class="t">공시일 순서로 재생 (시점마다 스냅샷 재계산)</div>
@@ -111,4 +114,14 @@
       <div class="box code">감사 보고서<br><span class="small">당시 알 수 있던 것 vs 나중에 안 것</span></div>
     </div>
   </div>
+  <div class="arrow">↓ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ↓ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ↓</div>
+  <div class="grp" style="margin-top:4px"><div class="t">종합 (코드 규칙)</div>
+    <div class="row">
+      <div class="box code"><b>종합 판정</b><br><span class="small">🔴 재검토 필요 · 🟡 주의 · 🟢 유지</span></div>
+      <div class="box code"><b>가정별 한 줄</b><br><span class="small">기준일 여유 → 최초 경고 → 현재 상태 → 유형</span></div>
+      <div class="box code"><b>타임라인 · 시나리오</b><br><span class="small">지표 추이 · 금리 +bp / EBITDA −%</span></div>
+    </div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="box ledger" style="font-size:18px"><b>출력 하나: 판단 카드</b></div>
 </div></body></html>

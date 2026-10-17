@@ -25,7 +25,9 @@ try:
 except Exception:  # noqa: BLE001 - no secrets file locally is normal
     pass
 
-from riskprobe import audit, audit_report, config, guidance, llm, probe, report, watch, watch_report  # noqa: E402
+from riskprobe import (  # noqa: E402
+    audit, audit_report, config, guidance, lifecycle, lifecycle_report, llm, probe, report, watch, watch_report,
+)
 from riskprobe.http import Http  # noqa: E402
 from riskprobe.ledger import Ledger  # noqa: E402
 from riskprobe.sources.sec import SecSource  # noqa: E402
@@ -194,6 +196,58 @@ def watch_tab() -> None:
             st.markdown(run_watch(tuple(names), since.strip(), until.strip(), rate_bp, ebitda_pct))
 
 
+REVIEW_DEMOS = {  # label: (ticker or CIK, T0, check date, include guidance)
+    "HE: 산불 전 판단 → 2025": ("HE", "2023-06-30", "2025-06-30", False),
+    "XPLR: 회사 전망 포함 → 2025": ("1603145", "2023-06-30", "2025-06-30", True),
+    "AES: 2023 판단 → 2025": ("AES", "2023-06-30", "2025-06-30", False),
+    "AMT: 투자 전 검토 (2025-06)": ("AMT", "2025-06-30", "2025-06-30", False),
+}
+
+
+@st.cache_data(show_spinner=False, ttl=6 * 3600)
+def run_review(query: str, t0: str, end: str, with_guidance: bool, rate_bp: float, ebitda_pct: float, user_json: str):
+    res = lifecycle.run(query, t0, end, http(), json.loads(user_json), include_guidance=with_guidance,
+                        rate_bp=rate_bp, ebitda_pct=ebitda_pct)
+    probe_md = report.render(res.probe, use_llm=True) if res.probe else ""
+    audit_md = audit_report.render(res.audit) if res.audit else ""
+    return res.verdict, lifecycle_report.render(res), res.series, probe_md, audit_md
+
+
+def review_tab() -> None:
+    st.subheader("통합 검토: 기업과 판단 기준일을 넣으면 판단 카드 하나")
+    st.caption("기준일 = 점검일이면 투자 전 검토, 기준일이 과거면 보유 점검과 사후 감사를 한 번에 한다.")
+    cols = st.columns(len(REVIEW_DEMOS))
+    for c, (label, (q, t0, end, g)) in zip(cols, REVIEW_DEMOS.items()):
+        if c.button(label, width="stretch"):
+            st.session_state.update(rv_q=q, rv_t0=t0, rv_end=end, rv_g=g, rv_go=True)
+    st.session_state.setdefault("rv_q", "HE")
+    st.session_state.setdefault("rv_t0", "2023-06-30")
+    st.session_state.setdefault("rv_end", "2025-06-30")
+    st.session_state.setdefault("rv_g", False)
+    c1, c2, c3 = st.columns([2, 1, 1])
+    q = c1.text_input("종목코드 또는 CIK (미국 상장사)", key="rv_q")
+    t0 = c2.text_input("판단 기준일", key="rv_t0")
+    end = c3.text_input("점검일", key="rv_end")
+    c4, c5, c6 = st.columns(3)
+    g = c4.checkbox("회사 전망(실적 발표)도 가정에 포함 (LLM 추가 호출)", key="rv_g")
+    rate_bp = c5.number_input("시나리오 금리 충격 (bp)", value=100.0, step=25.0)
+    ebitda_pct = c6.number_input("시나리오 EBITDA 충격 (%)", value=-20.0, step=5.0)
+    if st.button("검토 실행", type="primary") or st.session_state.pop("rv_go", False):
+        with st.spinner("기준일 Probe → 점검일까지 재생 → 금리·시나리오 → 종합 판정"):
+            verdict, md, series, probe_md, audit_md = run_review(q.strip(), t0.strip(), end.strip(), g, rate_bp,
+                                                                 ebitda_pct, "{}")
+        st.markdown(md)
+        if series:
+            st.markdown("**가정 지표 추이** (공개일 기준)")
+            st.line_chart(series, x="공개일", y="값", color="가정")
+        if probe_md:
+            with st.expander("상세: 기준일 Probe 보고서"):
+                st.markdown(probe_md)
+        if audit_md:
+            with st.expander("상세: 감사 보고서 (시간순 재생)"):
+                st.markdown(audit_md)
+
+
 def sources_tab() -> None:
     st.subheader("데이터·출처")
     p = config.ROOT / "SOURCES.md"
@@ -202,7 +256,10 @@ def sources_tab() -> None:
 
 def main() -> None:
     sidebar()
-    t1, t2, t3, t4 = st.tabs(["Probe (투자 전)", "Watch (보유 중)", "Audit (투자 후)", "데이터·출처"])
+    t0, t1, t2, t3, t4 = st.tabs(["통합 검토", "상세: Probe (투자 전)", "상세: Watch (보유 중)",
+                                  "상세: Audit (투자 후)", "데이터·출처"])
+    with t0:
+        review_tab()
     with t1:
         probe_tab()
     with t2:

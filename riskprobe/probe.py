@@ -184,8 +184,9 @@ def _ledger(out: ProbeResult, query: str, as_of: str) -> Ledger:
         statement, ind, direction = _STATEMENTS[r.template]
         n += 1
         inputs = {"floating_debt": r.inputs["floating_debt"]} if r.template == "rate_rise_to_coverage" else {}
-        if r.template == "rate_rise_to_coverage":
-            inputs["shock_bp_at_record"] = r.shock
+        inputs["margin_at_record"] = r.shock  # % of EBITDA, or bp for the rate path
+        if r.current is not None:
+            inputs["value_at_record"] = r.current
         lg.add(Assumption(f"A{n}", f"{statement} ({s.threshold_label})", "financial", ind, direction, r.threshold,
                           path_template=r.template, recorded_at=as_of,
                           source_url=out.filing.url if out.filing else "",
