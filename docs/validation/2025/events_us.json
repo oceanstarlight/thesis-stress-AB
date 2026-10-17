@@ -1,0 +1,581 @@
+[
+ {
+  "cik": "0001656634",
+  "name": "Gritstone bio, Inc.",
+  "event": "2025-01-03",
+  "sic": "2836",
+  "tickers": [],
+  "prior103": true,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-08-13"
+ },
+ {
+  "cik": "0001835972",
+  "name": "iLearningEngines, Inc.",
+  "event": "2025-01-03",
+  "sic": "7372",
+  "tickers": [],
+  "prior103": true,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-08-13"
+ },
+ {
+  "cik": "0001828852",
+  "name": "Mondee Holdings, Inc.",
+  "event": "2025-01-15",
+  "sic": "4700",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-08-14"
+ },
+ {
+  "cik": "0001580864",
+  "name": "Vroom, Inc.",
+  "event": "2025-01-15",
+  "sic": "5500",
+  "tickers": [
+   "VRM",
+   "VRMWW"
+  ],
+  "prior103": true,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-12"
+ },
+ {
+  "cik": "0001537028",
+  "name": "Independence Contract Drilling, Inc.",
+  "event": "2025-01-15",
+  "sic": "1381",
+  "tickers": [],
+  "prior103": true,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-19"
+ },
+ {
+  "cik": "0001750153",
+  "name": "Canoo Inc.",
+  "event": "2025-01-21",
+  "sic": "3714",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-14"
+ },
+ {
+  "cik": "0000890447",
+  "name": "Vertex Energy Inc.",
+  "event": "2025-01-22",
+  "sic": "2911",
+  "tickers": [],
+  "prior103": true,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-08-08"
+ },
+ {
+  "cik": "0001886799",
+  "name": "Bright Green Corp",
+  "event": "2025-01-28",
+  "sic": "2833",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-19"
+ },
+ {
+  "cik": "0001411688",
+  "name": "Container Store Group, Inc.",
+  "event": "2025-01-29",
+  "sic": "5700",
+  "tickers": [],
+  "prior103": true,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-10-30"
+ },
+ {
+  "cik": "0001813914",
+  "name": "CareMax, Inc.",
+  "event": "2025-02-03",
+  "sic": "8050",
+  "tickers": [],
+  "prior103": true,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-08-09"
+ },
+ {
+  "cik": "0001438901",
+  "name": "Auto Parts 4Less Group, Inc.",
+  "event": "2025-02-05",
+  "sic": "7389",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-02-14"
+ },
+ {
+  "cik": "0001723580",
+  "name": "BurgerFi International, Inc.",
+  "event": "2025-02-10",
+  "sic": "5812",
+  "tickers": [],
+  "prior103": true,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-05-16"
+ },
+ {
+  "cik": "0001506928",
+  "name": "Avinger Inc",
+  "event": "2025-02-10",
+  "sic": "3841",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-07"
+ },
+ {
+  "cik": "0001850838",
+  "name": "Omega Therapeutics, Inc.",
+  "event": "2025-02-14",
+  "sic": "2836",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-14"
+ },
+ {
+  "cik": "0001465470",
+  "name": "NaturalShrimp Inc",
+  "event": "2025-02-18",
+  "sic": "0900",
+  "tickers": [],
+  "prior103": true,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-08-14"
+ },
+ {
+  "cik": "0001731289",
+  "name": "Nikola Corp",
+  "event": "2025-02-19",
+  "sic": "3711",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-10-31"
+ },
+ {
+  "cik": "0001498710",
+  "name": "Spirit Aviation Holdings, Inc.",
+  "event": "2025-02-21",
+  "sic": "4512",
+  "tickers": [],
+  "prior103": true,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-25"
+ },
+ {
+  "cik": "0001098880",
+  "name": "IntelGenx Technologies Corp.",
+  "event": "2025-02-28",
+  "sic": "2834",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-05-15"
+ },
+ {
+  "cik": "0001162461",
+  "name": "CUTERA INC",
+  "event": "2025-03-05",
+  "sic": "3845",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-12"
+ },
+ {
+  "cik": "0000933738",
+  "name": "ENGLOBAL CORP",
+  "event": "2025-03-06",
+  "sic": "8711",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-12"
+ },
+ {
+  "cik": "0001101680",
+  "name": "DZS INC.",
+  "event": "2025-03-14",
+  "sic": "3661",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-12"
+ },
+ {
+  "cik": "0001559998",
+  "name": "Gaucho Group Holdings, Inc.",
+  "event": "2025-03-14",
+  "sic": "6552",
+  "tickers": [],
+  "prior103": true,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-08-14"
+ },
+ {
+  "cik": "0001779020",
+  "name": "Danimer Scientific, Inc.",
+  "event": "2025-03-18",
+  "sic": "2821",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-19"
+ },
+ {
+  "cik": "0001792581",
+  "name": "Kiromic Biopharma, Inc.",
+  "event": "2025-03-21",
+  "sic": "2836",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-08"
+ },
+ {
+  "cik": "0001804591",
+  "name": "Chrome Holding Co.",
+  "event": "2025-03-24",
+  "sic": "2834",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-12"
+ },
+ {
+  "cik": "0001830210",
+  "name": "Benson Hill, Inc.",
+  "event": "2025-03-25",
+  "sic": "2000",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-12"
+ },
+ {
+  "cik": "0001876945",
+  "name": "Gold Flora Corp.",
+  "event": "2025-03-27",
+  "sic": "0100",
+  "tickers": [],
+  "prior103": true,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-14"
+ },
+ {
+  "cik": "0001099132",
+  "name": "MANHATTAN SCIENTIFICS INC",
+  "event": "2025-04-08",
+  "sic": "3690",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-08-19"
+ },
+ {
+  "cik": "0000748790",
+  "name": "Global Clean Energy Holdings, Inc.",
+  "event": "2025-04-18",
+  "sic": "2860",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-14"
+ },
+ {
+  "cik": "0001183765",
+  "name": "Molecular Templates, Inc.",
+  "event": "2025-04-24",
+  "sic": "2834",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-08-14"
+ },
+ {
+  "cik": "0000105319",
+  "name": "WW INTERNATIONAL, INC.",
+  "event": "2025-05-07",
+  "sic": "7200",
+  "tickers": [
+   "WW"
+  ],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-06"
+ },
+ {
+  "cik": "0000727207",
+  "name": "Accelerate Diagnostics, Inc",
+  "event": "2025-05-08",
+  "sic": "3826",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-07"
+ },
+ {
+  "cik": "0001828811",
+  "name": "Li-Cycle Holdings Corp.",
+  "event": "2025-05-19",
+  "sic": "4955",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-07"
+ },
+ {
+  "cik": "0001537561",
+  "name": "Arch Therapeutics, Inc.",
+  "event": "2025-05-23",
+  "sic": "3841",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-08-19"
+ },
+ {
+  "cik": "0001906133",
+  "name": "iCoreConnect Inc.",
+  "event": "2025-06-03",
+  "sic": "7372",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-19"
+ },
+ {
+  "cik": "0001772695",
+  "name": "Sunnova Energy International Inc.",
+  "event": "2025-06-09",
+  "sic": "4931",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-10-31"
+ },
+ {
+  "cik": "0001783875",
+  "name": "4Front Ventures Corp.",
+  "event": "2025-06-10",
+  "sic": "2833",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-14"
+ },
+ {
+  "cik": "0000895419",
+  "name": "WOLFSPEED, INC.",
+  "event": "2025-07-01",
+  "sic": "3674",
+  "tickers": [
+   "WOLF"
+  ],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-07"
+ },
+ {
+  "cik": "0001389002",
+  "name": "MARIN SOFTWARE INC",
+  "event": "2025-07-03",
+  "sic": "7374",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-12"
+ },
+ {
+  "cik": "0001842356",
+  "name": "Wag! Group Co.",
+  "event": "2025-07-21",
+  "sic": "7200",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-13"
+ },
+ {
+  "cik": "0000799698",
+  "name": "LadRx Corp",
+  "event": "2025-07-31",
+  "sic": "2836",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-14"
+ },
+ {
+  "cik": "0000844887",
+  "name": "DIAMONDHEAD CASINO CORP",
+  "event": "2025-08-04",
+  "sic": "7011",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-13"
+ },
+ {
+  "cik": "0001455684",
+  "name": "TPI COMPOSITES, INC",
+  "event": "2025-08-15",
+  "sic": "3510",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-07"
+ },
+ {
+  "cik": "0001220754",
+  "name": "ModivCare Inc",
+  "event": "2025-08-21",
+  "sic": "4700",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-07"
+ },
+ {
+  "cik": "0001805024",
+  "name": "Amergent Hospitality Group Inc.",
+  "event": "2025-09-12",
+  "sic": "5810",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2023-07-17"
+ },
+ {
+  "cik": "0001210618",
+  "name": "SPI Energy Co., Ltd.",
+  "event": "2025-09-17",
+  "sic": "3674",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2023-11-20"
+ },
+ {
+  "cik": "0001893311",
+  "name": "LUXURBAN HOTELS INC.",
+  "event": "2025-09-18",
+  "sic": "6500",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-19"
+ },
+ {
+  "cik": "0001643988",
+  "name": "Loop Media, Inc.",
+  "event": "2025-10-20",
+  "sic": "7363",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-12-12"
+ },
+ {
+  "cik": "0000768835",
+  "name": "FORMER BL STORES INC",
+  "event": "2025-10-30",
+  "sic": "5331",
+  "tickers": [],
+  "prior103": true,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-09-12"
+ },
+ {
+  "cik": "0001456772",
+  "name": "OFFICE PROPERTIES INCOME TRUST",
+  "event": "2025-10-31",
+  "sic": "6500",
+  "tickers": [
+   "OPI"
+  ],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-10-30"
+ },
+ {
+  "cik": "0001761510",
+  "name": "TILT Holdings Inc.",
+  "event": "2025-11-07",
+  "sic": "2111",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-14"
+ },
+ {
+  "cik": "0001819395",
+  "name": "Sonder Holdings Inc.",
+  "event": "2025-11-14",
+  "sic": "7000",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-04"
+ },
+ {
+  "cik": "0001539029",
+  "name": "Clearside Biomedical, Inc.",
+  "event": "2025-11-25",
+  "sic": "2834",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-12"
+ },
+ {
+  "cik": "0001721741",
+  "name": "Lazydays Holdings, Inc.",
+  "event": "2025-12-01",
+  "sic": "5500",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-18"
+ },
+ {
+  "cik": "0001758057",
+  "name": "Luminar Technologies, Inc./DE",
+  "event": "2025-12-15",
+  "sic": "3714",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-18"
+ },
+ {
+  "cik": "0001159167",
+  "name": "IROBOT CORP",
+  "event": "2025-12-15",
+  "sic": "3630",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-11-06"
+ },
+ {
+  "cik": "0000846475",
+  "name": "ZYNEX INC",
+  "event": "2025-12-16",
+  "sic": "3845",
+  "tickers": [],
+  "prior103": false,
+  "periodic_before_t0": true,
+  "last_periodic": "2024-10-24"
+ }
+]

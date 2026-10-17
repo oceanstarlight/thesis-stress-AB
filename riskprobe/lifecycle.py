@@ -72,6 +72,7 @@ class LifecycleResult:
     audit: audit.AuditResult | None = None
     scenario: list[watch.ScenarioRow] = field(default_factory=list)
     scenario_label: str = ""
+    ebitda_now: float | None = None  # EBITDA (or EBIT fallback) at the check date, for the hard rule
     rate_moves: dict[str, tuple[float, str, str]] = field(default_factory=dict)
     first_event: str = ""  # first high-severity 8-K after T0
     score: float = 0.0
@@ -184,7 +185,8 @@ def run(query: str, t0: str, end: str, http, user: dict | None = None, include_g
             out.rows.append(row)
             continue
         if aa is None:  # no replay: T0 is the check date
-            st = "weakened" if (a.inputs.get("margin_at_record") or 1) <= 0 else "supported"
+            m = a.inputs.get("margin_at_record")
+            st = "weakened" if m is not None and m <= 0 else "supported"  # 0 = already at the threshold
             grade = reverse.grade(a.inputs.get("margin_at_record"), "%") if "margin_at_record" in a.inputs else ""
             row = Row(a.id, a.statement, th, _margin_text(a) or "-", "-", STATE_KO[st], "-", st, near=grade == "근접")
             v = a.inputs.get("value_at_record")
@@ -235,6 +237,12 @@ def run(query: str, t0: str, end: str, http, user: dict | None = None, include_g
             _add(row, _W["near"], "근접")
         out.rows.append(row)
 
+    # The EBITDA <= 0 hard rule must hold even when no assumption could be recorded (e.g. no
+    # interest expense line, so no coverage assumption): read the indicator itself.
+    data = src.load(query, since=since)
+    excluded, _ = quality.screen(data.facts, {f.accession: f.report_date for f in data.filings})
+    e_now = indicators.compute(watch._book(data.facts, excluded, end)).get("ebitda")
+    out.ebitda_now = e_now.value if e_now else None
     _verdict(out)
     return out
 
@@ -289,6 +297,8 @@ def _verdict(out: LifecycleResult) -> None:
     out.score = sum(r.score for r in out.rows) + ev_pts + sc_pts
 
     hard = [f"{r.id}: 점검일 EBITDA ≤ 0" for r in out.rows if r.broken]
+    if not hard and out.ebitda_now is not None and out.ebitda_now <= 0:
+        hard.append("점검일 EBITDA ≤ 0 (가정을 계산할 입력이 없어도 적용)")
     for e in evs:
         items = {i.strip() for i in (e.filing.items or "").split(",")}
         for item, label in config.VERDICT_HARD_8K_ITEMS.items():
@@ -296,6 +306,9 @@ def _verdict(out: LifecycleResult) -> None:
                 hard.append(f"{e.date} {e.filing.form} {item} {label}" if e.filing.form.startswith("8-K")
                             else f"{e.date} {e.filing.form} {', '.join(e.labels)}")
     breached = any(r.status_now == "weakened" for r in out.rows)
+    if not hard and not out.rows and out.score == 0:
+        out.verdict, out.reasons = "판단 불가", ["정량 가정을 하나도 계산하지 못했고 경고성 수시공시도 없어 판정하지 않음 (데이터 한계 참고)"]
+        return
     if hard:
         out.verdict = "재검토 필요"
     elif out.score >= _W["review"]:

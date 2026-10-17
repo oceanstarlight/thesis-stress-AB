@@ -1,0 +1,65 @@
+[
+{
+"group": "control",
+"query": "KR:317330",
+"name": "덕산테코피아",
+"pair": "TS트릴리온",
+"induty": "204"
+},
+{
+"group": "control",
+"query": "KR:001600",
+"name": "서광건설산업",
+"pair": "삼부토건",
+"induty": "41221"
+},
+{
+"group": "control",
+"query": "KR:065770",
+"name": "CS",
+"pair": "삼영이엔씨",
+"induty": "26429"
+},
+{
+"group": "control",
+"query": "KR:001880",
+"name": "디엘건설",
+"pair": "이화공영",
+"induty": "411"
+},
+{
+"group": "control",
+"query": "KR:251280",
+"name": "안지오랩",
+"pair": "EDGC",
+"induty": "70113"
+},
+{
+"group": "control",
+"query": "KR:002250",
+"name": "알보젠코리아",
+"pair": "동성제약",
+"induty": "212"
+},
+{
+"group": "control",
+"query": "KR:082800",
+"name": "비보존 제약",
+"pair": "한국유니온제약",
+"induty": "212"
+},
+{
+"group": "control",
+"query": "KR:413390",
+"name": "엠오티",
+"pair": "제일엠앤에스",
+"induty": "292"
+},
+{
+"group": "control",
+"query": "KR:014100",
+"name": "메디앙스",
+"pair": "STX",
+"induty": "46800"
+}
+]

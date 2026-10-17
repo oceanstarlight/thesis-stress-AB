@@ -67,3 +67,20 @@ def test_hard_rules(monkeypatch):
         rec[k].append(v)
     res = lifecycle.run("ACME", "2021-06-30", "2022-06-30", http, rate_bp=0, ebitda_pct=0)
     assert res.verdict == "재검토 필요" and any("4.02" in r for r in res.reasons)
+
+
+def test_pre_investment_breach_with_zero_headroom_is_weakened(monkeypatch):
+    # Found in the 2025 validation: a recorded headroom of exactly 0 ("이미 기준 초과") showed as 유지.
+    res = run(monkeypatch, {2020: 100, 2021: -10}, "2022-06-30", "2022-06-30", rate_bp=0, ebitda_pct=0)
+    assert res.verdict == "재검토 필요"
+    assert all(r.status_now == "weakened" for r in res.rows if r.at_t0.startswith("이미 기준 초과"))
+
+
+def test_no_assumption_rows():
+    # Found in the 2025 validation: no recordable assumption (no interest line) gave 유지 with 0 points.
+    out = lifecycle.LifecycleResult("X", "2024-12-31", "2024-12-31", ebitda_now=-5.0)
+    lifecycle._verdict(out)
+    assert out.verdict == "재검토 필요" and any("EBITDA ≤ 0" in r for r in out.reasons)
+    out = lifecycle.LifecycleResult("X", "2024-12-31", "2024-12-31", ebitda_now=5.0)
+    lifecycle._verdict(out)
+    assert out.verdict == "판단 불가"

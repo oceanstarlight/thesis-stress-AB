@@ -1,0 +1,442 @@
+[
+ {
+  "event_cik": "0001828852",
+  "event": "Mondee Holdings, Inc.",
+  "sic": "4700",
+  "control": [
+   "0001852244",
+   "GXO",
+   "GXO Logistics, Inc."
+  ]
+ },
+ {
+  "event_cik": "0001750153",
+  "event": "Canoo Inc.",
+  "sic": "3714",
+  "control": [
+   "0001789029",
+   "AEVA",
+   "Aeva Technologies, Inc."
+  ]
+ },
+ {
+  "event_cik": "0001886799",
+  "event": "Bright Green Corp",
+  "sic": "2833",
+  "control": [
+   "0001909747",
+   "JUSH",
+   "Jushi Holdings Inc."
+  ]
+ },
+ {
+  "event_cik": "0001438901",
+  "event": "Auto Parts 4Less Group, Inc.",
+  "sic": "7389",
+  "control": [
+   "0001448431",
+   "OPRX",
+   "OptimizeRx Corp"
+  ]
+ },
+ {
+  "event_cik": "0001506928",
+  "event": "Avinger Inc",
+  "sic": "3841",
+  "control": [
+   "0001506983",
+   "GCTK",
+   "Glucotrack, Inc."
+  ]
+ },
+ {
+  "event_cik": "0001850838",
+  "event": "Omega Therapeutics, Inc.",
+  "sic": "2836",
+  "control": [
+   "0001854270",
+   "SNTI",
+   "Senti Biosciences Holdings, Inc."
+  ]
+ },
+ {
+  "event_cik": "0001731289",
+  "event": "Nikola Corp",
+  "sic": "3711",
+  "control": [
+   "0001805521",
+   "FFAI",
+   "FARADAY FUTURE INTELLIGENT ELECTRIC INC."
+  ]
+ },
+ {
+  "event_cik": "0001098880",
+  "event": "IntelGenx Technologies Corp.",
+  "sic": "2834",
+  "control": [
+   "0001104506",
+   "INSM",
+   "INSMED Inc"
+  ]
+ },
+ {
+  "event_cik": "0001162461",
+  "event": "CUTERA INC",
+  "sic": "3845",
+  "control": [
+   "0001266806",
+   "VANI",
+   "Vivani Medical, Inc."
+  ]
+ },
+ {
+  "event_cik": "0000933738",
+  "event": "ENGLOBAL CORP",
+  "sic": "8711",
+  "control": [
+   "0001070789",
+   "HYOR",
+   "HyOrc Corp"
+  ]
+ },
+ {
+  "event_cik": "0001101680",
+  "event": "DZS INC.",
+  "sic": "3661",
+  "control": [
+   "0001178697",
+   "SONM",
+   "DNA X, Inc."
+  ]
+ },
+ {
+  "event_cik": "0001779020",
+  "event": "Danimer Scientific, Inc.",
+  "sic": "2821",
+  "control": [
+   "0001830033",
+   "PCTTW",
+   "PureCycle Technologies, Inc."
+  ]
+ },
+ {
+  "event_cik": "0001792581",
+  "event": "Kiromic Biopharma, Inc.",
+  "sic": "2836",
+  "control": [
+   "0001799448",
+   "ALGS",
+   "Aligos Therapeutics, Inc."
+  ]
+ },
+ {
+  "event_cik": "0001804591",
+  "event": "Chrome Holding Co.",
+  "sic": "2834",
+  "control": [
+   "0001806952",
+   "LYEL",
+   "Lyell Immunopharma, Inc."
+  ]
+ },
+ {
+  "event_cik": "0001830210",
+  "event": "Benson Hill, Inc.",
+  "sic": "2000",
+  "control": [
+   "0001852973",
+   "BRLSW",
+   "Borealis Foods Inc."
+  ]
+ },
+ {
+  "event_cik": "0001099132",
+  "event": "MANHATTAN SCIENTIFICS INC",
+  "sic": "3690",
+  "control": [
+   "0001289308",
+   "ENS",
+   "EnerSys"
+  ]
+ },
+ {
+  "event_cik": "0000748790",
+  "event": "Global Clean Energy Holdings, Inc.",
+  "sic": "2860",
+  "control": [
+   "0000778164",
+   "ALTO",
+   "Alto Ingredients, Inc."
+  ]
+ },
+ {
+  "event_cik": "0001183765",
+  "event": "Molecular Templates, Inc.",
+  "sic": "2834",
+  "control": [
+   "0001191070",
+   "NEUP",
+   "Neuphoria Therapeutics Inc."
+  ]
+ },
+ {
+  "event_cik": "0000105319",
+  "event": "WW INTERNATIONAL, INC.",
+  "sic": "7200",
+  "control": [
+   "0000716643",
+   "RGS",
+   "REGIS CORP"
+  ]
+ },
+ {
+  "event_cik": "0000727207",
+  "event": "Accelerate Diagnostics, Inc",
+  "sic": "3826",
+  "control": [
+   "0001000697",
+   "WAT",
+   "WATERS CORP /DE/"
+  ]
+ },
+ {
+  "event_cik": "0001828811",
+  "event": "Li-Cycle Holdings Corp.",
+  "sic": "4955",
+  "control": [
+   "0001882198",
+   "ATEKW",
+   "Athena Technology Acquisition Corp. II"
+  ]
+ },
+ {
+  "event_cik": "0001537561",
+  "event": "Arch Therapeutics, Inc.",
+  "sic": "3841",
+  "control": [
+   "0001543637",
+   "NUMD",
+   "Nu-Med Plus, Inc."
+  ]
+ },
+ {
+  "event_cik": "0001906133",
+  "event": "iCoreConnect Inc.",
+  "sic": "7372",
+  "control": [
+   "0001910139",
+   "MBLY",
+   "Mobileye Global Inc."
+  ]
+ },
+ {
+  "event_cik": "0001772695",
+  "event": "Sunnova Energy International Inc.",
+  "sic": "4931",
+  "control": [
+   "0001883984",
+   "ADIS",
+   "Aedis Energy Inc."
+  ]
+ },
+ {
+  "event_cik": "0001783875",
+  "event": "4Front Ventures Corp.",
+  "sic": "2833",
+  "control": [
+   "0001813814",
+   "DFTX",
+   "Definium Therapeutics, Inc."
+  ]
+ },
+ {
+  "event_cik": "0000895419",
+  "event": "WOLFSPEED, INC.",
+  "sic": "3674",
+  "control": [
+   "0000912093",
+   "VIAV",
+   "VIAVI SOLUTIONS INC."
+  ]
+ },
+ {
+  "event_cik": "0001389002",
+  "event": "MARIN SOFTWARE INC",
+  "sic": "7374",
+  "control": [
+   "0001419951",
+   "DTST",
+   "Data Storage Corp"
+  ]
+ },
+ {
+  "event_cik": "0001842356",
+  "event": "Wag! Group Co.",
+  "sic": "7200",
+  "control": [
+   "0001746119",
+   "VGES",
+   "Vanguard Green Investment Ltd"
+  ]
+ },
+ {
+  "event_cik": "0000799698",
+  "event": "LadRx Corp",
+  "sic": "2836",
+  "control": [
+   "0000836564",
+   "CPMV",
+   "Mosaic ImmunoEngineering Inc."
+  ]
+ },
+ {
+  "event_cik": "0000844887",
+  "event": "DIAMONDHEAD CASINO CORP",
+  "sic": "7011",
+  "control": [
+   "0000891482",
+   "FLL",
+   "FULL HOUSE RESORTS INC"
+  ]
+ },
+ {
+  "event_cik": "0001455684",
+  "event": "TPI COMPOSITES, INC",
+  "sic": "3510",
+  "control": [
+   "0001486957",
+   "BWXT",
+   "BWX Technologies, Inc."
+  ]
+ },
+ {
+  "event_cik": "0001220754",
+  "event": "ModivCare Inc",
+  "sic": "4700",
+  "control": [
+   "0001324424",
+   "EXPE",
+   "Expedia Group, Inc."
+  ]
+ },
+ {
+  "event_cik": "0001805024",
+  "event": "Amergent Hospitality Group Inc.",
+  "sic": "5810",
+  "control": [
+   "0001866581",
+   "BROS",
+   "Dutch Bros Inc."
+  ]
+ },
+ {
+  "event_cik": "0001210618",
+  "event": "SPI Energy Co., Ltd.",
+  "sic": "3674",
+  "control": [
+   "0001274494",
+   "FSLR",
+   "FIRST SOLAR, INC."
+  ]
+ },
+ {
+  "event_cik": "0001893311",
+  "event": "LUXURBAN HOTELS INC.",
+  "sic": "6500",
+  "control": [
+   "0002027317",
+   "CURB",
+   "Curbline Properties Corp."
+  ]
+ },
+ {
+  "event_cik": "0001643988",
+  "event": "Loop Media, Inc.",
+  "sic": "7363",
+  "control": [
+   "0001605888",
+   "CIRC",
+   "CIRCLE8 GROUP INC"
+  ]
+ },
+ {
+  "event_cik": "0001456772",
+  "event": "OFFICE PROPERTIES INCOME TRUST",
+  "sic": "6500",
+  "control": [
+   "0001476150",
+   "TRNO",
+   "Terreno Realty Corp"
+  ]
+ },
+ {
+  "event_cik": "0001761510",
+  "event": "TILT Holdings Inc.",
+  "sic": "2111",
+  "control": [
+   "0001948455",
+   "ISPR",
+   "Ispire Technology Inc."
+  ]
+ },
+ {
+  "event_cik": "0001819395",
+  "event": "Sonder Holdings Inc.",
+  "sic": "7000",
+  "control": [
+   "0001712189",
+   "TH",
+   "Target Hospitality Corp."
+  ]
+ },
+ {
+  "event_cik": "0001539029",
+  "event": "Clearside Biomedical, Inc.",
+  "sic": "2834",
+  "control": [
+   "0001540159",
+   "EDSA",
+   "Edesa Biotech, Inc."
+  ]
+ },
+ {
+  "event_cik": "0001721741",
+  "event": "Lazydays Holdings, Inc.",
+  "sic": "5500",
+  "control": [
+   "0001817004",
+   "NXXT",
+   "NEXTNRG, INC."
+  ]
+ },
+ {
+  "event_cik": "0001758057",
+  "event": "Luminar Technologies, Inc./DE",
+  "sic": "3714",
+  "control": [
+   "0001818644",
+   "LIDR",
+   "AEye, Inc."
+  ]
+ },
+ {
+  "event_cik": "0001159167",
+  "event": "IROBOT CORP",
+  "sic": "3630",
+  "control": [
+   "0001429393",
+   "TKLS",
+   "Trutankless, Inc."
+  ]
+ },
+ {
+  "event_cik": "0000846475",
+  "event": "ZYNEX INC",
+  "sic": "3845",
+  "control": [
+   "0000849401",
+   "ADMT",
+   "ADM TRONICS UNLIMITED, INC."
+  ]
+ }
+]
