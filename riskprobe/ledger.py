@@ -56,6 +56,10 @@ class Assumption:
     recorded_at: str = ""  # as-of date of the decision
     user_confirmed: bool = False
     history: list[StatusEntry] = field(default_factory=list)
+    # Values recorded with the decision that later checks need but filings may not carry in
+    # structured form, e.g. floating_debt for the rate path (with its source in input_notes).
+    inputs: dict[str, float] = field(default_factory=dict)
+    input_notes: list[str] = field(default_factory=list)
 
     def holds(self, value: float) -> bool | None:
         if self.threshold is None:

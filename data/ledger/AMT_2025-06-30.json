@@ -1,7 +1,7 @@
 {
   "entity": "AMT",
   "name": "AMERICAN TOWER CORP /MA/",
-  "created_at": "2026-10-17T12:06:08Z",
+  "created_at": "2026-10-17T12:42:31Z",
   "assumptions": [
     {
       "id": "A1",
@@ -20,7 +20,9 @@
       "source_url": "https://www.sec.gov/Archives/edgar/data/1053507/000105350725000025/amt-20241231.htm",
       "recorded_at": "2025-06-30",
       "user_confirmed": false,
-      "history": []
+      "history": [],
+      "inputs": {},
+      "input_notes": []
     },
     {
       "id": "A2",
@@ -39,7 +41,14 @@
       "source_url": "https://www.sec.gov/Archives/edgar/data/1053507/000105350725000025/amt-20241231.htm",
       "recorded_at": "2025-06-30",
       "user_confirmed": false,
-      "history": []
+      "history": [],
+      "inputs": {
+        "floating_debt": 1000000000.0,
+        "shock_bp_at_record": 19550.5
+      },
+      "input_notes": [
+        "변동금리 차입금: 연차보고서 공시 금액"
+      ]
     },
     {
       "id": "A3",
@@ -58,7 +67,9 @@
       "source_url": "https://www.sec.gov/Archives/edgar/data/1053507/000105350725000025/amt-20241231.htm",
       "recorded_at": "2025-06-30",
       "user_confirmed": false,
-      "history": []
+      "history": [],
+      "inputs": {},
+      "input_notes": []
     },
     {
       "id": "A4",
@@ -73,7 +84,9 @@
       "source_url": "https://www.sec.gov/Archives/edgar/data/1053507/000105350725000025/amt-20241231.htm",
       "recorded_at": "2025-06-30",
       "user_confirmed": false,
-      "history": []
+      "history": [],
+      "inputs": {},
+      "input_notes": []
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "entity": "AES",
   "name": "AES CORP",
-  "created_at": "2026-10-17T12:06:13Z",
+  "created_at": "2026-10-17T12:42:29Z",
   "assumptions": [
     {
       "id": "A1",
@@ -20,7 +20,9 @@
       "source_url": "https://www.sec.gov/Archives/edgar/data/874761/000087476123000010/aes-20221231.htm",
       "recorded_at": "2023-06-30",
       "user_confirmed": false,
-      "history": []
+      "history": [],
+      "inputs": {},
+      "input_notes": []
     },
     {
       "id": "A2",
@@ -39,7 +41,14 @@
       "source_url": "https://www.sec.gov/Archives/edgar/data/874761/000087476123000010/aes-20221231.htm",
       "recorded_at": "2023-06-30",
       "user_confirmed": false,
-      "history": []
+      "history": [],
+      "inputs": {
+        "floating_debt": 6000000000.0,
+        "shock_bp_at_record": -250.83333333333331
+      },
+      "input_notes": [
+        "변동금리 차입금: 연차보고서 공시 금액"
+      ]
     },
     {
       "id": "A3",
@@ -58,7 +67,11 @@
       "source_url": "https://www.sec.gov/Archives/edgar/data/874761/000087476123000010/aes-20221231.htm",
       "recorded_at": "2023-06-30",
       "user_confirmed": false,
-      "history": []
+      "history": [],
+      "inputs": {},
+      "input_notes": [
+        "총차입금: 연차보고서 문장의 금액(December 31, 2022 기준, 재무 기준 기간과 다를 수 있음)"
+      ]
     },
     {
       "id": "A4",
@@ -77,7 +90,11 @@
       "source_url": "https://www.sec.gov/Archives/edgar/data/874761/000087476123000010/aes-20221231.htm",
       "recorded_at": "2023-06-30",
       "user_confirmed": false,
-      "history": []
+      "history": [],
+      "inputs": {},
+      "input_notes": [
+        "총차입금: 연차보고서 문장의 금액(December 31, 2022 기준, 재무 기준 기간과 다를 수 있음)"
+      ]
     }
   ]
 }

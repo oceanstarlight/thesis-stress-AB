@@ -17,10 +17,11 @@ python scripts/p1_check.py AMT AES --as-of 2023-06-30 2025-06-30   # 지표·역
 python scripts/probe.py AES --as-of 2025-06-30   # Probe 위험 보고서 → reports/, 가정 원장 → data/ledger/
 python scripts/thesis.py 1603145 --as-of 2023-06-30 --name XPLR_guidance   # 기업 전망으로 원장 만들기
 python scripts/audit.py data/ledger/HE_2023-06-30.json --end 2025-06-30   # Audit 감사 보고서
+python scripts/watch.py --since 2023-06-30 --until 2023-09-30 --rate-bp 100 --ebitda-pct -20   # Watch 감시 브리프 + 사건 시나리오
 streamlit run app/streamlit_app.py   # 앱 (배포: docs/deploy.md)
 ```
 
-## 현재 구현 (P0~P3)
+## 현재 구현 (P0~P4)
 
 | 구성 | 위치 | 내용 |
 |---|---|---|
@@ -41,3 +42,5 @@ streamlit run app/streamlit_app.py   # 앱 (배포: docs/deploy.md)
 | 전망·메모 가설 | `riskprobe/guidance.py` | 실적 발표 전망 추출(인용 검증), 원장 변환, 이후 발표의 재언급 추적 |
 | Audit | `riskprobe/audit.py`, `audit_report.py` | 공시일별 재생, 상태 판정, 실패 유형, 가정 무리 신호, 수시공시 선행 시간 |
 | 앱 | `app/streamlit_app.py` | Probe·Audit·데이터 탭, 데모 버튼 |
+| 금리 | `riskprobe/sources/rates.py` | SOFR(뉴욕 연준), 국채 10년물(연준 H.15) |
+| Watch | `riskprobe/watch.py`, `watch_report.py`, `.github/workflows/watch.yml` | 기간 중 정기공시 재평가·수시공시·금리 트리거, 사건 시나리오, 평일 매일 실행·Issue 경보 |

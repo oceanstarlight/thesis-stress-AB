@@ -74,3 +74,6 @@ COUNTER_RULES = {
     "trend_worse_pct": 15.0,  # coverage or leverage worse by this much in a year
     "dso_increase_days": 15.0,
 }
+# Watch: a SOFR or 10-year Treasury move of at least this much over the window triggers a
+# re-check of every rate path (default rule).
+WATCH_RATE_TRIGGER_BP = 25.0

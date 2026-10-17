@@ -25,7 +25,7 @@ try:
 except Exception:  # noqa: BLE001 - no secrets file locally is normal
     pass
 
-from riskprobe import audit, audit_report, config, guidance, llm, probe, report  # noqa: E402
+from riskprobe import audit, audit_report, config, guidance, llm, probe, report, watch, watch_report  # noqa: E402
 from riskprobe.http import Http  # noqa: E402
 from riskprobe.ledger import Ledger  # noqa: E402
 from riskprobe.sources.sec import SecSource  # noqa: E402
@@ -85,7 +85,8 @@ def guidance_ledger(query: str, as_of: str) -> str:
 
 def sidebar() -> None:
     st.sidebar.title("RiskProbe")
-    st.sidebar.caption("투자 판단이 어떤 조건에서 틀리는지 찾고(Probe), 나중에 왜 틀렸는지 감사한다(Audit).")
+    st.sidebar.caption("투자 판단이 어떤 조건에서 틀리는지 찾고(Probe), 보유 중 그 조건에 가까워지는지 감시하고(Watch), "
+                       "나중에 왜 틀렸는지 감사한다(Audit).")
     ua = config.env("SEC_USER_AGENT")
     st.sidebar.markdown(f"{'🟢' if ua and '@' in ua else '🔴'} SEC EDGAR (User-Agent)")
     p = llm.provider()
@@ -162,6 +163,37 @@ def audit_tab() -> None:
             st.markdown(md)
 
 
+@st.cache_data(show_spinner=False, ttl=6 * 3600)
+def run_watch(names: tuple[str, ...], since: str, until: str, rate_bp: float, ebitda_pct: float) -> str:
+    ledgers = [Ledger.load(LEDGER_DIR / n) for n in names]
+    res = watch.run(ledgers, since, until, http())
+    rows, label = None, ""
+    if rate_bp or ebitda_pct:
+        rows, unk = watch.scenario(ledgers, until, http(), rate_bp, ebitda_pct)
+        res.unknowns += unk
+        label = f"금리 {rate_bp:+.0f}bp, EBITDA {ebitda_pct:+.0f}%"
+    return watch_report.render(res, rows, label)
+
+
+def watch_tab() -> None:
+    st.subheader("Watch: 보유 중 무엇이 바뀌었고, 어느 가정이 깨지는 쪽으로 가까워졌는가")
+    st.caption("새 정기공시로 가정 재평가, 경고성 수시공시(8-K), 금리(SOFR·국채 10년물) 변화를 코드 규칙으로 확인한다. "
+               "평일 매일 GitHub Actions로도 돌고, 새 경보는 GitHub Issue로 온다.")
+    wl_path = config.DATA_DIR / "watchlist.json"
+    default = json.loads(wl_path.read_text(encoding="utf-8")) if wl_path.exists() else []
+    names = st.multiselect("감시 목록 (가정 원장)", sorted(p.name for p in LEDGER_DIR.glob("*.json")), default=default)
+    c1, c2 = st.columns(2)
+    since = c1.text_input("감시 시작일", value="2023-06-30")
+    until = c2.text_input("감시 종료일", value="2023-09-30")
+    st.markdown("**사건 시나리오** (선택): 지금 이런 일이 생기면 감시 목록 중 어디가 기준을 넘는가")
+    c3, c4 = st.columns(2)
+    rate_bp = c3.number_input("금리 충격 (bp, 변동금리 차입금에 적용)", value=100.0, step=25.0)
+    ebitda_pct = c4.number_input("EBITDA 충격 (%)", value=-20.0, step=5.0)
+    if st.button("감시 실행", type="primary") and names:
+        with st.spinner("공시·수시공시·금리 확인"):
+            st.markdown(run_watch(tuple(names), since.strip(), until.strip(), rate_bp, ebitda_pct))
+
+
 def sources_tab() -> None:
     st.subheader("데이터·출처")
     p = config.ROOT / "SOURCES.md"
@@ -170,12 +202,14 @@ def sources_tab() -> None:
 
 def main() -> None:
     sidebar()
-    t1, t2, t3 = st.tabs(["Probe (투자 전)", "Audit (투자 후)", "데이터·출처"])
+    t1, t2, t3, t4 = st.tabs(["Probe (투자 전)", "Watch (보유 중)", "Audit (투자 후)", "데이터·출처"])
     with t1:
         probe_tab()
     with t2:
-        audit_tab()
+        watch_tab()
     with t3:
+        audit_tab()
+    with t4:
         sources_tab()
 
 

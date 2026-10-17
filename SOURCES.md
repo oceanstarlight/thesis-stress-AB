@@ -5,6 +5,8 @@
 | 자원 | 용도 | 이용 조건 | 비고 |
 |---|---|---|---|
 | SEC EDGAR (`data.sec.gov` submissions, companyfacts; `www.sec.gov` company_tickers, Archives) | 미국 상장사 공시 목록·XBRL 재무값·원문 링크 | 공개 데이터, 키 불필요. 연락처가 담긴 User-Agent 필수, 초당 10건 이하 (https://www.sec.gov/os/accessing-edgar-data) | 요청 간격 0.12초로 제한 |
+| 뉴욕 연준 Reference Rates API (SOFR) | Watch 금리 트리거, 금리 경로 재계산 | 공개 데이터, 키 불필요 (https://markets.newyorkfed.org/static/docs/markets-api.html) | |
+| 연준 H.15 Selected Interest Rates (국채 10년물) | Watch 금리 트리거 | 미국 정부 공공 데이터, 출처 표기 (https://www.federalreserve.gov/releases/h15/) | 연준 Data Download Program |
 | OpenDART (금융감독원) | 한국 상장사 공시 목록·재무제표·원본 XBRL | 무료 API 키, 일 20,000건 (https://opendart.fss.or.kr) | P0에서 원본 XBRL 다운로드 확인 |
 
 ## 기본 규칙 기준값 참고 자료 (`docs/p1_findings.md`)
