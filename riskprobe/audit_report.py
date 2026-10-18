@@ -59,7 +59,7 @@ def render(res: AuditResult) -> str:
     L += ["## 3. 같은 기간의 수시공시 (규칙 분류, 원인 단정 아님)", "", "| 공개일 | T0 대비 | 분류 | 중요도 | 원문 |", "|---|---|---|---|---|"]
     for ev in res.events:
         when = "이전(당시 알 수 있었음)" if ev.date <= res.t0 else "이후"
-        L.append(f"| {ev.date} | {when} | {', '.join(ev.labels) or '-'} | {ev.severity} | [8-K]({ev.filing.url}) |")
+        L.append(f"| {ev.date} | {when} | {', '.join(ev.labels) or '-'} | {ev.severity} | [{ev.filing.form}]({ev.filing.url}) |")
     L.append("")
 
     L += ["## 4. 당시 알 수 있었던 것과 나중에 알게 된 것", ""]

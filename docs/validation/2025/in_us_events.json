@@ -1,0 +1,310 @@
+[
+{
+"group": "event",
+"query": "1828852",
+"name": "Mondee Holdings, Inc.",
+"event_date": "2025-01-15",
+"sic": "4700"
+},
+{
+"group": "event",
+"query": "1750153",
+"name": "Canoo Inc.",
+"event_date": "2025-01-21",
+"sic": "3714"
+},
+{
+"group": "event",
+"query": "1886799",
+"name": "Bright Green Corp",
+"event_date": "2025-01-28",
+"sic": "2833"
+},
+{
+"group": "event",
+"query": "1438901",
+"name": "Auto Parts 4Less Group, Inc.",
+"event_date": "2025-02-05",
+"sic": "7389"
+},
+{
+"group": "event",
+"query": "1506928",
+"name": "Avinger Inc",
+"event_date": "2025-02-10",
+"sic": "3841"
+},
+{
+"group": "event",
+"query": "1850838",
+"name": "Omega Therapeutics, Inc.",
+"event_date": "2025-02-14",
+"sic": "2836"
+},
+{
+"group": "event",
+"query": "1731289",
+"name": "Nikola Corp",
+"event_date": "2025-02-19",
+"sic": "3711"
+},
+{
+"group": "event",
+"query": "1098880",
+"name": "IntelGenx Technologies Corp.",
+"event_date": "2025-02-28",
+"sic": "2834"
+},
+{
+"group": "event",
+"query": "1162461",
+"name": "CUTERA INC",
+"event_date": "2025-03-05",
+"sic": "3845"
+},
+{
+"group": "event",
+"query": "933738",
+"name": "ENGLOBAL CORP",
+"event_date": "2025-03-06",
+"sic": "8711"
+},
+{
+"group": "event",
+"query": "1101680",
+"name": "DZS INC.",
+"event_date": "2025-03-14",
+"sic": "3661"
+},
+{
+"group": "event",
+"query": "1779020",
+"name": "Danimer Scientific, Inc.",
+"event_date": "2025-03-18",
+"sic": "2821"
+},
+{
+"group": "event",
+"query": "1792581",
+"name": "Kiromic Biopharma, Inc.",
+"event_date": "2025-03-21",
+"sic": "2836"
+},
+{
+"group": "event",
+"query": "1804591",
+"name": "Chrome Holding Co.",
+"event_date": "2025-03-24",
+"sic": "2834"
+},
+{
+"group": "event",
+"query": "1830210",
+"name": "Benson Hill, Inc.",
+"event_date": "2025-03-25",
+"sic": "2000"
+},
+{
+"group": "event",
+"query": "1099132",
+"name": "MANHATTAN SCIENTIFICS INC",
+"event_date": "2025-04-08",
+"sic": "3690"
+},
+{
+"group": "event",
+"query": "748790",
+"name": "Global Clean Energy Holdings, Inc.",
+"event_date": "2025-04-18",
+"sic": "2860"
+},
+{
+"group": "event",
+"query": "1183765",
+"name": "Molecular Templates, Inc.",
+"event_date": "2025-04-24",
+"sic": "2834"
+},
+{
+"group": "event",
+"query": "105319",
+"name": "WW INTERNATIONAL, INC.",
+"event_date": "2025-05-07",
+"sic": "7200"
+},
+{
+"group": "event",
+"query": "727207",
+"name": "Accelerate Diagnostics, Inc",
+"event_date": "2025-05-08",
+"sic": "3826"
+},
+{
+"group": "event",
+"query": "1828811",
+"name": "Li-Cycle Holdings Corp.",
+"event_date": "2025-05-19",
+"sic": "4955"
+},
+{
+"group": "event",
+"query": "1537561",
+"name": "Arch Therapeutics, Inc.",
+"event_date": "2025-05-23",
+"sic": "3841"
+},
+{
+"group": "event",
+"query": "1906133",
+"name": "iCoreConnect Inc.",
+"event_date": "2025-06-03",
+"sic": "7372"
+},
+{
+"group": "event",
+"query": "1772695",
+"name": "Sunnova Energy International Inc.",
+"event_date": "2025-06-09",
+"sic": "4931"
+},
+{
+"group": "event",
+"query": "1783875",
+"name": "4Front Ventures Corp.",
+"event_date": "2025-06-10",
+"sic": "2833"
+},
+{
+"group": "event",
+"query": "895419",
+"name": "WOLFSPEED, INC.",
+"event_date": "2025-07-01",
+"sic": "3674"
+},
+{
+"group": "event",
+"query": "1389002",
+"name": "MARIN SOFTWARE INC",
+"event_date": "2025-07-03",
+"sic": "7374"
+},
+{
+"group": "event",
+"query": "1842356",
+"name": "Wag! Group Co.",
+"event_date": "2025-07-21",
+"sic": "7200"
+},
+{
+"group": "event",
+"query": "799698",
+"name": "LadRx Corp",
+"event_date": "2025-07-31",
+"sic": "2836"
+},
+{
+"group": "event",
+"query": "844887",
+"name": "DIAMONDHEAD CASINO CORP",
+"event_date": "2025-08-04",
+"sic": "7011"
+},
+{
+"group": "event",
+"query": "1455684",
+"name": "TPI COMPOSITES, INC",
+"event_date": "2025-08-15",
+"sic": "3510"
+},
+{
+"group": "event",
+"query": "1220754",
+"name": "ModivCare Inc",
+"event_date": "2025-08-21",
+"sic": "4700"
+},
+{
+"group": "event",
+"query": "1805024",
+"name": "Amergent Hospitality Group Inc.",
+"event_date": "2025-09-12",
+"sic": "5810"
+},
+{
+"group": "event",
+"query": "1210618",
+"name": "SPI Energy Co., Ltd.",
+"event_date": "2025-09-17",
+"sic": "3674"
+},
+{
+"group": "event",
+"query": "1893311",
+"name": "LUXURBAN HOTELS INC.",
+"event_date": "2025-09-18",
+"sic": "6500"
+},
+{
+"group": "event",
+"query": "1643988",
+"name": "Loop Media, Inc.",
+"event_date": "2025-10-20",
+"sic": "7363"
+},
+{
+"group": "event",
+"query": "1456772",
+"name": "OFFICE PROPERTIES INCOME TRUST",
+"event_date": "2025-10-31",
+"sic": "6500"
+},
+{
+"group": "event",
+"query": "1761510",
+"name": "TILT Holdings Inc.",
+"event_date": "2025-11-07",
+"sic": "2111"
+},
+{
+"group": "event",
+"query": "1819395",
+"name": "Sonder Holdings Inc.",
+"event_date": "2025-11-14",
+"sic": "7000"
+},
+{
+"group": "event",
+"query": "1539029",
+"name": "Clearside Biomedical, Inc.",
+"event_date": "2025-11-25",
+"sic": "2834"
+},
+{
+"group": "event",
+"query": "1721741",
+"name": "Lazydays Holdings, Inc.",
+"event_date": "2025-12-01",
+"sic": "5500"
+},
+{
+"group": "event",
+"query": "1758057",
+"name": "Luminar Technologies, Inc./DE",
+"event_date": "2025-12-15",
+"sic": "3714"
+},
+{
+"group": "event",
+"query": "1159167",
+"name": "IROBOT CORP",
+"event_date": "2025-12-15",
+"sic": "3630"
+},
+{
+"group": "event",
+"query": "846475",
+"name": "ZYNEX INC",
+"event_date": "2025-12-16",
+"sic": "3845"
+}
+]

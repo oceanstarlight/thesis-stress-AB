@@ -40,6 +40,16 @@ SECRET_PARAMS = ("crtfc_key",)
 # SEC asks for at most ten requests per second.
 MIN_INTERVAL_SEC = {"www.sec.gov": 0.12, "data.sec.gov": 0.12}
 
+# DART (Korea). Financial statements per report come from the single-company full-statement
+# API; each call takes seconds, so reports are fetched in parallel and only from this many
+# years before the analysis date. Listed companies are bundled in data/dart_corps.json
+# (scripts/build_dart_index.py) because the full corp code file is slow to download.
+DART_YEARS_BEFORE = 3
+DART_WORKERS = 6
+DART_FINANCIAL_TTL_HOURS = 24 * 7
+DART_CORPCODE_TTL_HOURS = 24 * 30
+DART_INDEX = DATA_DIR / "dart_corps.json"
+
 # Default rules (PLANS.md 2.4, 7.1). Used only when neither the user nor a filing gives a
 # threshold, always labeled "기본 규칙" with the source, and changeable by the user.
 # There is no single market standard (docs/p1_findings.md). The values sit inside commonly
@@ -77,3 +87,23 @@ COUNTER_RULES = {
 # Watch: a SOFR or 10-year Treasury move of at least this much over the window triggers a
 # re-check of every rate path (default rule).
 WATCH_RATE_TRIGGER_BP = 25.0
+# Lifecycle verdict (riskprobe/lifecycle.py): score + hard rules. Weights are conventions set
+# here, not estimates; the card shows every component. Not a probability.
+VERDICT_SCORE = {
+    "depth_pct": (10.0, 30.0),  # % beyond the threshold -> 1 / 2 / 3 points
+    "depth_bp": (25.0, 100.0),  # rate path: bp beyond -> 1 / 2 / 3 points
+    "source_weight": {"user": 1.0, "disclosed": 1.0, "default_rule": 0.7},
+    "worse_since_t0": 1.0,  # breached now and worse than at T0 (or newly breached)
+    "known_at_t0_factor": 0.5,  # already breached at T0 and not worse since
+    "mixed": 1.0,
+    "near": 0.5,
+    "event_high": 2.0,  # 8-K in the last 90 days
+    "event_medium": 1.0,
+    "event_cap": 3.0,
+    "scenario": 1.0,  # the what-if breaks an assumption that holds now
+    "review": 3.0,  # total >= -> 재검토 필요 (one assumption at twice a default-rule cap and worse since T0 = 3.1)
+    "caution": 2.0,  # total >= -> 주의 (any breached assumption is at least 주의)
+}
+# Hard rules: 재검토 필요 regardless of score.
+VERDICT_HARD_8K_ITEMS = {"1.03": "파산·법정관리", "2.04": "채무 조기상환 사유 발생", "4.02": "재무제표 신뢰 불가(재작성)"}
+VERDICT_HARD_8K_DAYS = 365

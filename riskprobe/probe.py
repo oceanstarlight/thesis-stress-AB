@@ -17,12 +17,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from riskprobe import config, counter, events, extract, indicators, pit, quality, reverse, text
+from riskprobe import config, counter, events, extract, forms, indicators, pit, quality, reverse, text
 from riskprobe.ledger import Assumption, Ledger, Threshold
 from riskprobe.models import Evidence, Unknown
-from riskprobe.sources.sec import Filing, SecSource
+from riskprobe.sources import market
+from riskprobe.sources.sec import Filing
 
-ANNUAL = ("10-K", "10-K/A", "20-F", "40-F")
+ANNUAL = forms.ANNUAL
 
 
 @dataclass
@@ -85,8 +86,8 @@ def run(query: str, as_of: str, http, user: dict | None = None) -> ProbeResult:
     (threshold values chosen by the analyst)."""
     user = user or {}
     out = ProbeResult(query, as_of)
-    src = SecSource(http)
-    data = src.load(query)
+    src = market.source_for(query, http)
+    data = src.load(query, since=market.since_for(as_of))
     out.unknowns += data.unknowns
     out.name = data.name
     if not data.facts:
@@ -100,6 +101,8 @@ def run(query: str, as_of: str, http, user: dict | None = None) -> ProbeResult:
     out.anchor = book.anchor()
     out.indicators = indicators.compute(book)
     out.unknowns += book.unknowns
+    out.unknowns += [u for u in out.indicators["ebitda"].unknowns if u.code == "indicator_ebit_basis"] \
+        if "ebitda" in out.indicators else []
     if out.anchor is None:
         out.unknowns.append(Unknown("probe_no_data", "기준일까지 공개된 재무 값이 없어 분석하지 않음"))
         return out
@@ -108,6 +111,8 @@ def run(query: str, as_of: str, http, user: dict | None = None) -> ProbeResult:
     out.filing = _latest_annual(data.filings, as_of)
     if out.filing is None:
         out.unknowns.append(Unknown("probe_no_annual_report", "기준일까지 제출된 연차보고서가 없어 문서 기반 위험 요인을 쓰지 않음"))
+    elif market.is_kr(query):
+        out.unknowns.append(Unknown("probe_kr_text_skipped", "한국 사업보고서 본문 추출은 아직 지원하지 않아 문서 기반 위험 요인을 쓰지 않음"))
     else:
         try:
             paras = text.select(text.paragraphs(src._get(out.filing.url).text), config.EXTRACT_MAX_CHARS)

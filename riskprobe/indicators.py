@@ -25,6 +25,8 @@ from datetime import date, timedelta
 from riskprobe.models import Fact, Unknown
 from riskprobe.pit import Snapshot
 
+# A company reports in one currency; SEC filers in USD, DART filers in KRW.
+MONEY_UNITS = ("USD", "KRW")
 QUARTER_DAYS = (80, 100)
 YEAR_DAYS = (350, 380)
 
@@ -48,38 +50,49 @@ def _alts(*names: str | tuple[str, ...]) -> tuple[tuple[str, ...], ...]:
 
 LINE_ITEMS = {li.id: li for li in [
     LineItem("revenue", "매출", True, _alts("Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax",
-                                            "RevenueFromContractWithCustomerIncludingAssessedTax", "SalesRevenueNet")),
-    LineItem("gross_profit", "매출총이익", True, _alts("GrossProfit")),
-    LineItem("operating_income", "영업이익", True, _alts("OperatingIncomeLoss")),
+                                            "RevenueFromContractWithCustomerIncludingAssessedTax", "SalesRevenueNet", "ifrs-full:Revenue")),
+    LineItem("gross_profit", "매출총이익", True, _alts("GrossProfit", "ifrs-full:GrossProfit")),
+    LineItem("operating_income", "영업이익", True, _alts("OperatingIncomeLoss", "dart:OperatingIncomeLoss")),
     LineItem("d_and_a", "감가상각비", True, _alts("DepreciationDepletionAndAmortization", "DepreciationAndAmortization",
                                                "DepreciationAmortizationAndAccretionNet",
-                                               "UtilitiesOperatingExpenseDepreciationAndAmortization", "Depreciation"), nonnegative=True),
+                                               "UtilitiesOperatingExpenseDepreciationAndAmortization", "Depreciation",
+                                               "dart-calc:DepreciationAndAmortisation"), nonnegative=True),
     LineItem("pretax_income", "법인세차감전이익", True, _alts(
         "IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest",
-        "IncomeLossFromContinuingOperationsBeforeIncomeTaxesMinorityInterestAndIncomeLossFromEquityMethodInvestments")),
+        "IncomeLossFromContinuingOperationsBeforeIncomeTaxesMinorityInterestAndIncomeLossFromEquityMethodInvestments",
+        "ifrs-full:ProfitLossBeforeTax")),
     LineItem("interest_expense", "이자비용", True, _alts("InterestExpense", "InterestExpenseNonoperating",
-                                                      "InterestExpenseDebt", "InterestAndDebtExpense"), nonnegative=True),
-    LineItem("net_income", "순이익", True, _alts("NetIncomeLoss", "ProfitLoss")),
+                                                      "InterestExpenseDebt", "InterestAndDebtExpense",
+                                                      # DART: cash flow add-back, then a face line, then cash interest paid
+                                                      "dart:AdjustmentsForInterestExpenses", "ifrs-full:InterestExpense",
+                                                      "dart-calc:InterestPaid"), nonnegative=True),
+    LineItem("net_income", "순이익", True, _alts("NetIncomeLoss", "ProfitLoss", "ifrs-full:ProfitLoss")),
     LineItem("operating_cash_flow", "영업현금흐름", True, _alts("NetCashProvidedByUsedInOperatingActivities",
-                                                           "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations")),
-    LineItem("capex", "설비투자", True, _alts("PaymentsToAcquirePropertyPlantAndEquipment", "PaymentsToAcquireProductiveAssets"), nonnegative=True),
-    LineItem("cash", "현금성자산", False, _alts("CashAndCashEquivalentsAtCarryingValue"), nonnegative=True),
+                                                           "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations",
+                                                           "ifrs-full:CashFlowsFromUsedInOperatingActivities")),
+    LineItem("capex", "설비투자", True, _alts("PaymentsToAcquirePropertyPlantAndEquipment", "PaymentsToAcquireProductiveAssets",
+                                         "ifrs-full:PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities"), nonnegative=True),
+    LineItem("cash", "현금성자산", False, _alts("CashAndCashEquivalentsAtCarryingValue", "ifrs-full:CashAndCashEquivalents"), nonnegative=True),
     LineItem("total_debt", "총차입금", False, _alts(
         "LongTermDebt", "DebtAndCapitalLeaseObligations", "DebtLongtermAndShorttermCombinedAmount",
         ("LongTermDebtNoncurrent", "LongTermDebtCurrent"), ("LongTermDebtNoncurrent", "DebtCurrent"),
         ("LongTermDebtAndCapitalLeaseObligations", "LongTermDebtAndCapitalLeaseObligationsCurrent"),
-        ("LongTermDebtAndCapitalLeaseObligations", "DebtCurrent")), nonnegative=True),
+        ("LongTermDebtAndCapitalLeaseObligations", "DebtCurrent"),
+        "dart-calc:TotalBorrowings"), nonnegative=True),
     LineItem("short_term_borrowings", "단기차입금", False, _alts("ShortTermBorrowings", "CommercialPaper"), nonnegative=True),
     # Impairments, for adjusted EBITDA (PLANS.md 12). Goodwill and other assets are separate
     # groups because companies tag them separately; within a group the first tag found is used.
-    LineItem("impairment_goodwill", "영업권 손상차손", True, _alts("GoodwillAndIntangibleAssetImpairment", "GoodwillImpairmentLoss"),
+    LineItem("impairment_goodwill", "영업권 손상차손", True, _alts("GoodwillAndIntangibleAssetImpairment", "GoodwillImpairmentLoss",
+                                                                     "dart:AdjustmentsForImpairmentLossesOfIntangibleAssets"),
              nonnegative=True),
-    LineItem("impairment_assets", "자산 손상차손", True, _alts("AssetImpairmentCharges", "ImpairmentOfLongLivedAssetsHeldForUse"),
+    LineItem("impairment_assets", "자산 손상차손", True, _alts("AssetImpairmentCharges", "ImpairmentOfLongLivedAssetsHeldForUse",
+                                                              "dart:AdjustmentsForImpairmentLossesOfPropertyPlantAndEquipment"),
              nonnegative=True),
-    LineItem("current_assets", "유동자산", False, _alts("AssetsCurrent")),
-    LineItem("current_liabilities", "유동부채", False, _alts("LiabilitiesCurrent")),
-    LineItem("inventory", "재고자산", False, _alts("InventoryNet"), nonnegative=True),
-    LineItem("receivables", "매출채권", False, _alts("AccountsReceivableNetCurrent"), nonnegative=True),
+    LineItem("current_assets", "유동자산", False, _alts("AssetsCurrent", "ifrs-full:CurrentAssets")),
+    LineItem("current_liabilities", "유동부채", False, _alts("LiabilitiesCurrent", "ifrs-full:CurrentLiabilities")),
+    LineItem("inventory", "재고자산", False, _alts("InventoryNet", "ifrs-full:Inventories"), nonnegative=True),
+    LineItem("receivables", "매출채권", False, _alts("AccountsReceivableNetCurrent", "ifrs-full:TradeAndOtherCurrentReceivables",
+                                                     "dart:ShortTermTradeReceivable"), nonnegative=True),
 ]}
 
 
@@ -105,7 +118,7 @@ def _shift_day(d: str, days: int) -> str:
 
 
 def _quarters_of(snap: Snapshot, concept: str) -> dict[str, Measured]:
-    durs = [f for f in snap.facts.values() if f.concept == concept and f.unit == "USD" and f.days]
+    durs = [f for f in snap.facts.values() if f.concept == concept and f.unit in MONEY_UNITS and f.days]
     out: dict[str, Measured] = {}
     for f in durs:
         if QUARTER_DAYS[0] <= f.days <= QUARTER_DAYS[1]:
@@ -125,12 +138,12 @@ def _quarters_of(snap: Snapshot, concept: str) -> dict[str, Measured]:
 def _years_of(snap: Snapshot, concept: str) -> dict[str, Measured]:
     return {f.period_end: Measured(f.value, f.period_start, f.period_end, [f], "fy")
             for f in snap.facts.values()
-            if f.concept == concept and f.unit == "USD" and f.days and YEAR_DAYS[0] <= f.days <= YEAR_DAYS[1]}
+            if f.concept == concept and f.unit in MONEY_UNITS and f.days and YEAR_DAYS[0] <= f.days <= YEAR_DAYS[1]}
 
 
 def _instants_of(snap: Snapshot, concept: str) -> dict[str, Measured]:
     return {f.period_end: Measured(f.value, None, f.period_end, [f], "instant")
-            for f in snap.facts.values() if f.concept == concept and f.unit == "USD" and f.period_start is None}
+            for f in snap.facts.values() if f.concept == concept and f.unit in MONEY_UNITS and f.period_start is None}
 
 
 def _merge(per_alt: list[dict[str, Measured]]) -> dict[str, Measured]:
@@ -157,6 +170,8 @@ class Book:
 
     def __init__(self, snap: Snapshot):
         self.snap = snap
+        units = [f.unit for f in snap.facts.values() if f.unit in MONEY_UNITS]
+        self.currency = max(set(units), key=units.count) if units else "USD"
         self._cache: dict[tuple, dict[str, Measured]] = {}
         self.unknowns: list[Unknown] = []
 
@@ -214,7 +229,7 @@ class Book:
         for alt in LINE_ITEMS[item_id].alternatives:
             if len(alt) != 1:
                 continue
-            durs = [f for f in self.snap.facts.values() if f.concept == alt[0] and f.unit == "USD" and f.days]
+            durs = [f for f in self.snap.facts.values() if f.concept == alt[0] and f.unit in MONEY_UNITS and f.days]
             years = [f for f in durs if YEAR_DAYS[0] <= f.days <= YEAR_DAYS[1] and f.period_end < end]
             if not years:
                 continue
@@ -245,7 +260,7 @@ class Book:
         fy_end = fy_ends[-1]
         li = LINE_ITEMS[item_id]
         for alt in li.alternatives:
-            durs = [f for f in self.snap.facts.values() if f.concept == alt[0] and f.unit == "USD" and f.days]
+            durs = [f for f in self.snap.facts.values() if f.concept == alt[0] and f.unit in MONEY_UNITS and f.days]
             fy = next((f for f in durs if f.period_end == fy_end and YEAR_DAYS[0] <= f.days <= YEAR_DAYS[1]), None)
             if fy_end == end:
                 cur = prior = None
@@ -352,7 +367,7 @@ def compute(book: Book, end: str | None = None) -> dict[str, Indicator]:
         _ratio(ind, oi.value, rev.value, 100)
 
     da, interest = book.ttm("d_and_a", end), book.ttm("interest_expense", end)
-    ind = new("ebitda", "EBITDA(TTM)", "USD", "영업이익 + 감가상각비")
+    ind = new("ebitda", "EBITDA(TTM)", book.currency, "영업이익 + 감가상각비")
     pretax = book.ttm("pretax_income", end)
     if oi is None and pretax is not None and interest is not None and da is not None:
         # No operating income tag (e.g. AES): EBIT approximated as pretax income + interest.
@@ -360,18 +375,28 @@ def compute(book: Book, end: str | None = None) -> dict[str, Indicator]:
         ind.inputs.update(pretax_income=pretax, interest_expense=interest, d_and_a=da)
         ind.value = pretax.value + interest.value + da.value
         oi = Measured(pretax.value + interest.value, pretax.period_start, end, pretax.facts + interest.facts, "derived")
+    elif oi is not None and da is None and book.currency == "KRW":
+        # Decided with the user: Korean face statements often omit depreciation; use operating
+        # income (EBIT) instead and say so. EBIT <= EBITDA, so every ratio is stricter.
+        ind.label_ko = "EBIT(TTM, 감가상각비 미공시로 EBITDA 대신 영업이익)"
+        ind.formula = "영업이익 (감가상각비가 재무제표 본문에 없어 더하지 않음, 실제보다 엄격)"
+        ind.inputs.update(operating_income=oi)
+        ind.value = oi.value
+        ind.unknowns.append(Unknown("indicator_ebit_basis", "감가상각비가 재무제표 본문에 없어 EBITDA 대신 영업이익을 씀. 실제보다 엄격하게 계산됨"))
+        da = Measured(0.0, oi.period_start, end, [], "not_reported")
     elif _need(ind, operating_income=oi, d_and_a=da):
         ind.value = oi.value + da.value
     ebitda = out["ebitda"].value
+    basis = "EBIT" if da is not None and da.method == "not_reported" else "EBITDA"
 
-    ind = new("interest_coverage", "이자보상배율(TTM, EBITDA 기준)", "x", "EBITDA / 이자비용")
+    ind = new("interest_coverage", f"이자보상배율(TTM, {basis} 기준)", "x", f"{basis} / 이자비용")
     if ebitda is not None and _need(ind, operating_income=oi, d_and_a=da, interest_expense=interest):
         _ratio(ind, ebitda, interest.value)
     elif ebitda is None:
         _need(ind, operating_income=oi, d_and_a=da)
 
     debt, cash = book.at("total_debt", end), book.at("cash", end)
-    ind = new("net_debt_to_ebitda", "순차입금/EBITDA", "x", "(총차입금 - 현금성자산) / EBITDA")
+    ind = new("net_debt_to_ebitda", f"순차입금/{basis}", "x", f"(총차입금 - 현금성자산) / {basis}")
     if ebitda is not None and _need(ind, total_debt=debt, cash=cash, operating_income=oi, d_and_a=da):
         if ebitda <= 0:
             ind.unknowns.append(Unknown("indicator_negative_ebitda", "EBITDA가 영 이하라 차입 배수가 의미 없어 계산하지 않음"))
@@ -383,7 +408,7 @@ def compute(book: Book, end: str | None = None) -> dict[str, Indicator]:
     # Adjusted EBITDA: add back impairments found in standard tags (PLANS.md 12, option B).
     imp_parts = {k: book.ttm_sparse(k, end) for k in ("impairment_goodwill", "impairment_assets")}
     found = {k: v for k, v in imp_parts.items() if v[0] is not None}
-    ind = new("ebitda_adjusted", "조정 EBITDA(TTM, 손상차손 가산)", "USD",
+    ind = new("ebitda_adjusted", "조정 EBITDA(TTM, 손상차손 가산)", book.currency,
               "EBITDA + 표준 태그로 확인된 손상차손 (영업권 + 기타 자산)")
     if ebitda is not None and found:
         ind.inputs.update({k: v[0] for k, v in found.items()})

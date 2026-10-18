@@ -12,6 +12,7 @@ some days before the filing date seen here.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 
 from riskprobe import config
@@ -29,6 +30,61 @@ def pad(cik: str | int) -> str:
     return str(int(cik)).zfill(10)
 
 
+# Words dropped when matching company names ("Alphabet Inc." == "alphabet").
+_NAME_NOISE = {"inc", "incorporated", "corp", "corporation", "co", "company", "ltd", "limited", "plc", "llc",
+               "lp", "sa", "nv", "ag", "the", "adr", "de", "ma", "ny"}
+
+
+def norm_name(s: str) -> str:
+    words = re.sub(r"[^a-z0-9 ]", " ", s.lower().replace("&", " and ")).split()
+    return " ".join(w for w in words if w not in _NAME_NOISE)
+
+
+@dataclass
+class Candidate:
+    cik: str
+    ticker: str  # first listed ticker (usually the common share)
+    title: str
+    tickers: list[str] = field(default_factory=list)
+    market: str = "미국 SEC"
+
+    @property
+    def label(self) -> str:
+        return f"{self.title} ({', '.join(self.tickers[:3])} · {self.market})"
+
+
+# Sectors where the debt-service indicators (EBITDA coverage, net debt/EBITDA) do not describe risk.
+# SIC 60xx-64xx: banks, credit, brokers, insurance. REITs (6798) are kept: their leverage tests apply.
+FINANCIAL_SIC = (6000, 6499)
+FOREIGN_FORMS = ("20-F", "40-F")
+
+
+@dataclass
+class Profile:
+    """Light pre-check from the submissions file: who files what, and whether our indicators fit."""
+    cik: str
+    name: str
+    sic: str = ""
+    sic_description: str = ""
+    annual_forms: list[str] = field(default_factory=list)
+    warnings: list[Unknown] = field(default_factory=list)
+
+
+def profile_warnings(sic: str, sic_description: str, forms: set[str]) -> list[Unknown]:
+    out = []
+    if not forms & {"10-K", "10-Q"} and forms & set(FOREIGN_FORMS):
+        out.append(Unknown("sec_foreign_filer",
+                           "외국 기업용 연차보고서 양식으로 공시해 분기 값이 없고 수시공시 분류가 맞지 않음. 지표 신뢰도 낮음",
+                           ", ".join(sorted(forms & set(FOREIGN_FORMS)))))
+    elif not forms & {"10-K", "10-Q"}:
+        out.append(Unknown("sec_no_periodic", "미국 정기 재무보고서(연차·분기)가 없어 지표를 계산할 수 없음"))
+    if sic.isdigit() and FINANCIAL_SIC[0] <= int(sic) <= FINANCIAL_SIC[1]:
+        out.append(Unknown("sec_financial_sector",
+                           f"금융업({sic_description or '은행·보험 등'})은 예금·보험부채가 차입금과 섞여 EBITDA·레버리지 지표가 위험을 설명하지 못함. 지표 신뢰도 낮음",
+                           f"SIC {sic}"))
+    return out
+
+
 @dataclass
 class Filing:
     accession: str
@@ -36,8 +92,9 @@ class Filing:
     filing_date: str
     accepted_at: str  # ISO-8601 acceptance time, may be empty
     report_date: str
-    items: str  # 8-K item numbers, e.g. "2.02,9.01"
+    items: str  # 8-K item numbers, e.g. "2.02,9.01" (DART: the SEC-equivalent item of a tagged title)
     url: str
+    title: str = ""  # DART report name, e.g. "[기재정정]사업보고서 (2023.12)"
 
 
 @dataclass
@@ -55,6 +112,7 @@ class SecSource:
     def __init__(self, http):
         self.http = http
         self._tickers: list[dict] | None = None
+        self._last_submissions: dict = {}
 
     def available(self) -> tuple[bool, str]:
         ua = config.env("SEC_USER_AGENT")
@@ -68,20 +126,61 @@ class SecSource:
             self._tickers = list(self._get(TICKERS).json().values())
         return self._tickers
 
+    def search(self, query: str, limit: int = 10) -> list[Candidate]:
+        """Ticker, CIK or company name -> ranked candidates, one per company (CIK).
+
+        Rank: exact ticker or CIK, exact name, name starts with the query, every query word starts
+        a name word, then substring. Deterministic, no network beyond the cached ticker file.
+        """
+        q = query.strip()
+        if not q:
+            return []
+        qn, qu = norm_name(q), q.upper()
+        qwords = qn.split()
+        by_cik: dict[str, Candidate] = {}
+        rank: dict[str, tuple] = {}
+        for i, t in enumerate(self.tickers()):
+            cik = pad(t["cik_str"])
+            c = by_cik.setdefault(cik, Candidate(cik, t["ticker"], t["title"]))
+            c.tickers.append(t["ticker"])
+            tn = norm_name(t["title"])
+            if t["ticker"].upper() == qu or (q.isdigit() and int(q) == int(t["cik_str"])):
+                r = 0
+            elif qn and tn == qn:
+                r = 1
+            elif qn and tn.startswith(qn):
+                r = 2
+            elif qwords and all(any(w.startswith(x) for w in tn.split()) for x in qwords):
+                r = 3
+            elif len(qn) >= 3 and qn.replace(" ", "") in tn.replace(" ", ""):
+                r = 4
+            else:
+                continue
+            # Ties: shorter names first (the parent over "... Capital Trust"), then file order (market cap).
+            key = (r, len(tn), i)
+            rank[cik] = min(rank.get(cik, key), key)
+        return [by_cik[c] for c in sorted(rank, key=rank.get)][:limit]
+
     def cik_for(self, query: str) -> str | None:
-        """Ticker or CIK -> zero-padded CIK."""
+        """Ticker, CIK or company name -> zero-padded CIK (best search match)."""
         q = query.strip()
         if q.isdigit():
             return pad(q)
-        for t in self.tickers():
-            if t["ticker"].upper() == q.upper():
-                return pad(t["cik_str"])
-        return None
+        found = self.search(q, limit=1)
+        return found[0].cik if found else None
+
+    def profile(self, cik: str) -> Profile:
+        d = self._get(SUBMISSIONS.format(cik=pad(cik))).json()
+        forms = set(d["filings"]["recent"]["form"])
+        sic, desc = str(d.get("sic") or ""), d.get("sicDescription") or ""
+        return Profile(pad(cik), d.get("name", ""), sic, desc,
+                       sorted(forms & {"10-K", "20-F", "40-F"}), profile_warnings(sic, desc, forms))
 
     def filings(self, cik: str) -> tuple[list[Filing], str]:
         d = self._get(SUBMISSIONS.format(cik=pad(cik))).json()
         pages = [d["filings"]["recent"]] + [self._get(SUBMISSIONS_PAGE.format(name=f["name"])).json()
                                             for f in d["filings"].get("files", [])]
+        self._last_submissions = d
         out = []
         for p in pages:
             for i, acc in enumerate(p["accessionNumber"]):
@@ -105,8 +204,9 @@ class SecSource:
                                         FILING_INDEX.format(cik=int(cik), acc=acc.replace("-", ""))))
         return out, d.get("entityName", "")
 
-    def load(self, query: str) -> SecResult:
-        """Facts and filings for a ticker or CIK. Never raises; failures become unknowns."""
+    def load(self, query: str, since: str | None = None) -> SecResult:
+        """Facts and filings for a ticker, CIK or name. Never raises; failures become unknowns.
+        ``since`` is accepted for parity with DART; companyfacts comes whole in one call."""
         res = SecResult()
         ok, reason = self.available()
         if not ok:
@@ -115,9 +215,12 @@ class SecSource:
         try:
             cik = self.cik_for(query)
             if cik is None:
-                res.unknowns.append(Unknown("sec_not_found", "입력한 종목코드나 CIK에 해당하는 기업을 찾지 못함", query))
+                res.unknowns.append(Unknown("sec_not_found", "입력한 종목코드·CIK·회사 이름에 해당하는 미국 공시 기업을 찾지 못함", query))
                 return res
             res.filings, res.name = self.filings(cik)
+            d = self._last_submissions
+            res.unknowns += profile_warnings(str(d.get("sic") or ""), d.get("sicDescription") or "",
+                                             {f.form for f in res.filings})
             res.facts, _ = self.facts(cik)
         except Exception as exc:  # noqa: BLE001
             res.unknowns.append(Unknown("sec_error", f"{self.label_ko} 호출 실패, 이 구간은 확인하지 못함",

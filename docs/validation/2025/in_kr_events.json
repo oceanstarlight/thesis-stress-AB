@@ -1,0 +1,66 @@
+[
+{
+"group": "event",
+"query": "KR:001470",
+"name": "삼부토건",
+"event_date": "2025-02-24",
+"induty": "41221",
+"prior": false
+},
+{
+"group": "event",
+"query": "KR:065570",
+"name": "삼영이엔씨",
+"event_date": "2025-03-20",
+"induty": "26429",
+"prior": false
+},
+{
+"group": "event",
+"query": "KR:001840",
+"name": "이화공영",
+"event_date": "2025-04-02",
+"induty": "411",
+"prior": false
+},
+{
+"group": "event",
+"query": "KR:002210",
+"name": "동성제약",
+"event_date": "2025-05-07",
+"induty": "212",
+"prior": false
+},
+{
+"group": "event",
+"query": "KR:352770",
+"name": "셀레스트라",
+"event_date": "2025-09-08",
+"induty": "213",
+"prior": false
+},
+{
+"group": "event",
+"query": "KR:080720",
+"name": "한국유니온제약",
+"event_date": "2025-09-09",
+"induty": "212",
+"prior": false
+},
+{
+"group": "event",
+"query": "KR:412540",
+"name": "제일엠앤에스",
+"event_date": "2025-12-02",
+"induty": "292",
+"prior": false
+},
+{
+"group": "event",
+"query": "KR:011810",
+"name": "STX",
+"event_date": "2025-12-19",
+"induty": "46800",
+"prior": false
+}
+]

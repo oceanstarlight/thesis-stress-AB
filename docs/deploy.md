@@ -6,6 +6,8 @@
 | --- | --- | --- | --- |
 | 단위·통합 + 앱 렌더링 | `python -m pytest -q` | 불필요 (가짜 HTTP, Streamlit AppTest) | 푸시·PR마다 GitHub Actions `tests` 자동 실행 |
 | 실데이터 점검 | `python scripts/probe.py AES --as-of 2025-06-30`, `python scripts/audit.py data/ledger/HE_2023-06-30.json --end 2025-06-30` | `SEC_USER_AGENT` (+ 선택 `GEMINI_API_KEY`) | 수동 |
+| 한국 기업 점검 | `python scripts/review.py KR:003490 --t0 2023-06-30 --end 2025-06-30` (이름도 됨: `"대한항공"`) | `DART_API_KEY` (+ 선택 `ECOS_API_KEY`) | 수동 |
+| 한국 상장사 목록 갱신 | `python scripts/build_dart_index.py` → `data/dart_corps.json` | `DART_API_KEY` | 가끔 (신규 상장 반영) |
 
 ## Streamlit Community Cloud 배포
 
@@ -13,17 +15,24 @@
 2. **Advanced settings** → Python 3.12, **Secrets**에 `.streamlit/secrets.toml.example` 형식으로 입력:
    ```toml
    SEC_USER_AGENT = "이름 이메일@example.com"
+   DART_API_KEY = "..."      # 한국 기업 (없으면 미국 기업만)
+   ECOS_API_KEY = "..."      # 선택: 한국 금리 경로 (CD 91일·국고채 3년)
    GEMINI_API_KEY = "..."
    RISKPROBE_LLM_PROVIDER = "auto"
    ```
    앱이 시작할 때 `st.secrets`의 최상위 문자열 값을 환경 변수로 옮기므로 코드 수정 없이 읽힌다.
-3. 배포 후 확인: 사이드바에 `🟢 SEC EDGAR`, `🟢 LLM: gemini`가 보이는지 → Probe 데모 버튼(AES) → Audit 탭 데모(HE).
+3. 배포 후 확인: 사이드바에 `🟢 SEC EDGAR`, `🟢 DART`, `🟢 LLM: gemini`가 보이는지 → Probe 데모 버튼(AES) → Audit 탭 데모(HE) → 통합 검토에서 `대한항공`, `alphabet` 이름 검색.
+   한국 기업은 첫 실행에 보고서별 재무 API를 수십 번 불러 30초~1분 걸린다(이후 캐시).
 
 ## 예약 감시 (GitHub Actions `watch`)
 
 - 평일 매일 22:17 UTC에 `data/watchlist.json`의 원장을 확인하고, 새 경보(높음·중간)가 있으면 GitHub Issue를 연다.
 - 필요한 설정: 저장소 Settings → Secrets and variables → Actions → **`SEC_USER_AGENT`** 추가. LLM 키는 필요 없다.
 - 마지막 실행일은 Actions 캐시(`watch_state/state.json`)에 저장돼 다음 실행이 그 이후만 본다. 수동 실행: Actions → watch → Run workflow.
+
+## 병합 후 앱 오류가 나면
+
+새 코드를 병합하면 Streamlit Cloud가 파일만 바꾸고 이미 메모리에 올라간 일부 모듈은 예전 것을 계속 쓸 수 있다. 이때 로컬에서는 안 나는 `AttributeError` 같은 오류가 난다. **Manage app → ⋮ → Reboot app**으로 다시 시작하면 해결된다.
 
 ## 운영 메모
 

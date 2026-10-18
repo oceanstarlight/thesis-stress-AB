@@ -23,7 +23,7 @@ from riskprobe import audit, config, events, indicators, pit, quality, reverse
 from riskprobe.ledger import Ledger
 from riskprobe.models import Unknown
 from riskprobe.sources import rates
-from riskprobe.sources.sec import SecSource
+from riskprobe.sources import market
 
 SEVERITY_ORDER = {"high": 0, "medium": 1, "info": 2}
 WORSE = {("supported", "mixed"), ("supported", "weakened"), ("mixed", "weakened"),
@@ -62,9 +62,10 @@ def _book(facts, excluded, d: str) -> indicators.Book:
     return indicators.Book(pit.snapshot(facts, d, exclude=excluded))
 
 
-def _rate_headroom(a, book: indicators.Book, sofr_move_since_record: float | None) -> tuple[float | None, str]:
+def _rate_headroom(a, book: indicators.Book, sofr_move_since_record: float | None,
+                   rate_label: str = "SOFR") -> tuple[float | None, str]:
     """Shock (bp) the latest EBITDA and interest can still absorb with the recorded floating
-    debt, minus the SOFR move since the decision date."""
+    debt, minus the floating reference rate's move (SOFR, CD 91-day) since the decision date."""
     end = book.anchor()
     if end is None or "floating_debt" not in a.inputs:
         return None, "변동금리 차입금 기록이 없어 금리 경로를 다시 계산하지 않음"
@@ -74,15 +75,16 @@ def _rate_headroom(a, book: indicators.Book, sofr_move_since_record: float | Non
     if r.shock is None:
         return None, "재계산에 필요한 값이 없음"
     left = r.shock - (sofr_move_since_record or 0.0)
-    return left, f"최신 재무({end}) 기준 흡수 가능 {r.shock:,.0f}bp − 기록 이후 SOFR 변화 {sofr_move_since_record or 0:+.0f}bp"
+    return left, f"최신 재무({end}) 기준 흡수 가능 {r.shock:,.0f}bp − 기록 이후 {rate_label.split(" (")[0]} 변화 {sofr_move_since_record or 0:+.0f}bp"
 
 
 def run(ledgers: list[Ledger], since: str, until: str, http) -> WatchResult:
     out = WatchResult(since, until)
-    src = SecSource(http)
     earliest = min([a.recorded_at for lg in ledgers for a in lg.assumptions] + [since])
     series = {}
-    for key in ("sofr", "ust10y"):
+    currencies = sorted({market.currency(lg.entity) for lg in ledgers}) or ["USD"]
+    keys = [k for c in currencies for k in (rates.FLOATING[c], rates.LONG[c])]
+    for key in keys:
         s, u = rates.fetch(http, key, indicators._one_year_before(earliest), until)
         out.unknowns += u
         if s is not None:
@@ -102,7 +104,8 @@ def run(ledgers: list[Ledger], since: str, until: str, http) -> WatchResult:
             out.unknowns.append(Unknown("watch_not_yet_recorded", "기간 종료일 이후에 기록된 원장은 이번 감시에서 제외함", lg.entity))
             continue
         start = max(since, recorded)  # nothing to watch before the decision was recorded
-        data = src.load(lg.entity)
+        src = market.source_for(lg.entity, http)
+        data = src.load(lg.entity, since=market.since_for(recorded))
         out.unknowns += [u for u in data.unknowns if u.code not in ("sec_press_release_gap", "sec_coverage_start")]
         if not data.facts:
             continue
@@ -134,8 +137,9 @@ def run(ledgers: list[Ledger], since: str, until: str, http) -> WatchResult:
         for a in lg.assumptions:
             if a.path_template != "rate_rise_to_coverage":
                 continue
-            mv = series["sofr"].change_bp(a.recorded_at, until) if "sofr" in series else None
-            left, why = _rate_headroom(a, book, mv[0] if mv else None)
+            fkey = market.floating_rate(lg.entity)
+            mv = series[fkey].change_bp(a.recorded_at, until) if fkey in series else None
+            left, why = _rate_headroom(a, book, mv[0] if mv else None, rates.LABELS[fkey])
             state.rate_headroom[a.id] = left
             if rate_trigger and left is not None:
                 grade = reverse.grade(left, "bp")
@@ -168,12 +172,12 @@ def scenario(ledgers: list[Ledger], as_of: str, http, rate_bp: float = 0.0, ebit
     to every quantitative assumption, on point-in-time data as of ``as_of``. Conditional
     arithmetic, not a forecast."""
     rows, unknowns = [], []
-    src = SecSource(http)
     for lg in ledgers:
-        if min((a.recorded_at for a in lg.assumptions), default=as_of) > as_of:
+        recorded = min((a.recorded_at for a in lg.assumptions), default=as_of)
+        if recorded > as_of:
             continue
         floating = next((a.inputs["floating_debt"] for a in lg.assumptions if "floating_debt" in a.inputs), 0.0)
-        data = src.load(lg.entity)
+        data = market.source_for(lg.entity, http).load(lg.entity, since=market.since_for(recorded))
         if not data.facts:
             unknowns += data.unknowns
             continue

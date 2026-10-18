@@ -1,0 +1,310 @@
+[
+{
+"group": "control",
+"query": "1852244",
+"name": "GXO Logistics, Inc.",
+"pair": "Mondee Holdings, Inc.",
+"sic": "4700"
+},
+{
+"group": "control",
+"query": "1789029",
+"name": "Aeva Technologies, Inc.",
+"pair": "Canoo Inc.",
+"sic": "3714"
+},
+{
+"group": "control",
+"query": "1909747",
+"name": "Jushi Holdings Inc.",
+"pair": "Bright Green Corp",
+"sic": "2833"
+},
+{
+"group": "control",
+"query": "1448431",
+"name": "OptimizeRx Corp",
+"pair": "Auto Parts 4Less Group, Inc.",
+"sic": "7389"
+},
+{
+"group": "control",
+"query": "1506983",
+"name": "Glucotrack, Inc.",
+"pair": "Avinger Inc",
+"sic": "3841"
+},
+{
+"group": "control",
+"query": "1854270",
+"name": "Senti Biosciences Holdings, Inc.",
+"pair": "Omega Therapeutics, Inc.",
+"sic": "2836"
+},
+{
+"group": "control",
+"query": "1805521",
+"name": "FARADAY FUTURE INTELLIGENT ELECTRIC INC.",
+"pair": "Nikola Corp",
+"sic": "3711"
+},
+{
+"group": "control",
+"query": "1104506",
+"name": "INSMED Inc",
+"pair": "IntelGenx Technologies Corp.",
+"sic": "2834"
+},
+{
+"group": "control",
+"query": "1266806",
+"name": "Vivani Medical, Inc.",
+"pair": "CUTERA INC",
+"sic": "3845"
+},
+{
+"group": "control",
+"query": "1070789",
+"name": "HyOrc Corp",
+"pair": "ENGLOBAL CORP",
+"sic": "8711"
+},
+{
+"group": "control",
+"query": "1178697",
+"name": "DNA X, Inc.",
+"pair": "DZS INC.",
+"sic": "3661"
+},
+{
+"group": "control",
+"query": "1830033",
+"name": "PureCycle Technologies, Inc.",
+"pair": "Danimer Scientific, Inc.",
+"sic": "2821"
+},
+{
+"group": "control",
+"query": "1799448",
+"name": "Aligos Therapeutics, Inc.",
+"pair": "Kiromic Biopharma, Inc.",
+"sic": "2836"
+},
+{
+"group": "control",
+"query": "1806952",
+"name": "Lyell Immunopharma, Inc.",
+"pair": "Chrome Holding Co.",
+"sic": "2834"
+},
+{
+"group": "control",
+"query": "1852973",
+"name": "Borealis Foods Inc.",
+"pair": "Benson Hill, Inc.",
+"sic": "2000"
+},
+{
+"group": "control",
+"query": "1289308",
+"name": "EnerSys",
+"pair": "MANHATTAN SCIENTIFICS INC",
+"sic": "3690"
+},
+{
+"group": "control",
+"query": "778164",
+"name": "Alto Ingredients, Inc.",
+"pair": "Global Clean Energy Holdings, Inc.",
+"sic": "2860"
+},
+{
+"group": "control",
+"query": "1191070",
+"name": "Neuphoria Therapeutics Inc.",
+"pair": "Molecular Templates, Inc.",
+"sic": "2834"
+},
+{
+"group": "control",
+"query": "716643",
+"name": "REGIS CORP",
+"pair": "WW INTERNATIONAL, INC.",
+"sic": "7200"
+},
+{
+"group": "control",
+"query": "1000697",
+"name": "WATERS CORP /DE/",
+"pair": "Accelerate Diagnostics, Inc",
+"sic": "3826"
+},
+{
+"group": "control",
+"query": "1882198",
+"name": "Athena Technology Acquisition Corp. II",
+"pair": "Li-Cycle Holdings Corp.",
+"sic": "4955"
+},
+{
+"group": "control",
+"query": "1543637",
+"name": "Nu-Med Plus, Inc.",
+"pair": "Arch Therapeutics, Inc.",
+"sic": "3841"
+},
+{
+"group": "control",
+"query": "1910139",
+"name": "Mobileye Global Inc.",
+"pair": "iCoreConnect Inc.",
+"sic": "7372"
+},
+{
+"group": "control",
+"query": "1883984",
+"name": "Aedis Energy Inc.",
+"pair": "Sunnova Energy International Inc.",
+"sic": "4931"
+},
+{
+"group": "control",
+"query": "1813814",
+"name": "Definium Therapeutics, Inc.",
+"pair": "4Front Ventures Corp.",
+"sic": "2833"
+},
+{
+"group": "control",
+"query": "912093",
+"name": "VIAVI SOLUTIONS INC.",
+"pair": "WOLFSPEED, INC.",
+"sic": "3674"
+},
+{
+"group": "control",
+"query": "1419951",
+"name": "Data Storage Corp",
+"pair": "MARIN SOFTWARE INC",
+"sic": "7374"
+},
+{
+"group": "control",
+"query": "1746119",
+"name": "Vanguard Green Investment Ltd",
+"pair": "Wag! Group Co.",
+"sic": "7200"
+},
+{
+"group": "control",
+"query": "836564",
+"name": "Mosaic ImmunoEngineering Inc.",
+"pair": "LadRx Corp",
+"sic": "2836"
+},
+{
+"group": "control",
+"query": "891482",
+"name": "FULL HOUSE RESORTS INC",
+"pair": "DIAMONDHEAD CASINO CORP",
+"sic": "7011"
+},
+{
+"group": "control",
+"query": "1486957",
+"name": "BWX Technologies, Inc.",
+"pair": "TPI COMPOSITES, INC",
+"sic": "3510"
+},
+{
+"group": "control",
+"query": "1324424",
+"name": "Expedia Group, Inc.",
+"pair": "ModivCare Inc",
+"sic": "4700"
+},
+{
+"group": "control",
+"query": "1866581",
+"name": "Dutch Bros Inc.",
+"pair": "Amergent Hospitality Group Inc.",
+"sic": "5810"
+},
+{
+"group": "control",
+"query": "1274494",
+"name": "FIRST SOLAR, INC.",
+"pair": "SPI Energy Co., Ltd.",
+"sic": "3674"
+},
+{
+"group": "control",
+"query": "2027317",
+"name": "Curbline Properties Corp.",
+"pair": "LUXURBAN HOTELS INC.",
+"sic": "6500"
+},
+{
+"group": "control",
+"query": "1605888",
+"name": "CIRCLE8 GROUP INC",
+"pair": "Loop Media, Inc.",
+"sic": "7363"
+},
+{
+"group": "control",
+"query": "1476150",
+"name": "Terreno Realty Corp",
+"pair": "OFFICE PROPERTIES INCOME TRUST",
+"sic": "6500"
+},
+{
+"group": "control",
+"query": "1948455",
+"name": "Ispire Technology Inc.",
+"pair": "TILT Holdings Inc.",
+"sic": "2111"
+},
+{
+"group": "control",
+"query": "1712189",
+"name": "Target Hospitality Corp.",
+"pair": "Sonder Holdings Inc.",
+"sic": "7000"
+},
+{
+"group": "control",
+"query": "1540159",
+"name": "Edesa Biotech, Inc.",
+"pair": "Clearside Biomedical, Inc.",
+"sic": "2834"
+},
+{
+"group": "control",
+"query": "1817004",
+"name": "NEXTNRG, INC.",
+"pair": "Lazydays Holdings, Inc.",
+"sic": "5500"
+},
+{
+"group": "control",
+"query": "1818644",
+"name": "AEye, Inc.",
+"pair": "Luminar Technologies, Inc./DE",
+"sic": "3714"
+},
+{
+"group": "control",
+"query": "1429393",
+"name": "Trutankless, Inc.",
+"pair": "IROBOT CORP",
+"sic": "3630"
+},
+{
+"group": "control",
+"query": "849401",
+"name": "ADM TRONICS UNLIMITED, INC.",
+"pair": "ZYNEX INC",
+"sic": "3845"
+}
+]

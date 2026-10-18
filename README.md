@@ -28,7 +28,10 @@ streamlit run app/streamlit_app.py   # 앱 (배포: docs/deploy.md)
 | 구성 | 위치 | 내용 |
 |---|---|---|
 | HTTP | `riskprobe/http.py` | 디스크 캐시, 호스트별 요청 간격, 키 제거 |
-| SEC 수집 | `riskprobe/sources/sec.py` | 티커/CIK 조회, 공시 목록(접수 시각 포함), XBRL 값(공시별 버전) |
+| SEC 수집 | `riskprobe/sources/sec.py` | 회사 이름·티커·CIK 검색, 외국 기업·금융업 경고, 공시 목록(접수 시각 포함), XBRL 값(공시별 버전) |
+| DART 수집 | `riskprobe/sources/dart.py` | 한국 상장사 이름(한·영)·종목코드 검색, 정기보고서별 재무제표(정정일 기준), 차입금·감가상각비 합산, 주요사항보고서·거래소공시 제목 규칙 |
+| 소스 선택 | `riskprobe/sources/market.py` | `KR:종목코드`·한글 이름 → DART, 그 밖 → SEC. 통화별 금리(SOFR·CD 91일) |
+| 금리 | `riskprobe/sources/rates.py` | SOFR·미 국채 10년(키 불필요), 한국은행 ECOS CD 91일·국고채 3년(키 필요) |
 | 기준일 필터 | `riskprobe/pit.py` | 기준일 스냅샷, 정정 버전 이력, 재생용 공시 순서, 누수 검사 |
 | 데이터 품질 | `riskprobe/quality.py` | 대상 기간 밖 이상 값 제외 |
 | 지표 카탈로그 | `riskprobe/indicators.py` | 대체 태그, 분기 환산, TTM, 지표 12개, 부호 오류·재작성 혼합 차단 |

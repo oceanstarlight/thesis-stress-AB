@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from riskprobe.lifecycle import VERDICT_RULES, LifecycleResult
-from riskprobe.report import conclusion
+from riskprobe.report import WARN_CODES, conclusion
 from riskprobe.sources import rates
 
 BADGE = {"재검토 필요": "🔴", "주의": "🟡", "유지": "🟢", "판단 불가": "⚪"}
@@ -13,14 +13,16 @@ def render(res: LifecycleResult) -> str:
     mode = "투자 전 검토" if res.t0 == res.end else "보유 점검 + 사후 감사"
     L = [f"# 판단 카드: {res.name or res.query}", "",
          f"- 판단 기준일 **{res.t0}** → 점검일 **{res.end}** ({mode})",
-         "- 각 시점은 그날까지 공개된 공시만으로 계산했다. 판정은 코드 규칙이며 확률·매매 의견이 아니다.", "",
-         f"## {BADGE.get(res.verdict, '')} 종합 판정: {res.verdict}", ""]
+         "- 각 시점은 그날까지 공개된 공시만으로 계산했다. 판정은 코드 규칙이며 확률·매매 의견이 아니다.", ""]
+    warned = {u.code: u.message for u in res.unknowns if u.code in WARN_CODES}
+    L += [f"> ⚠️ {m}" for m in warned.values()] + ([""] if warned else [])
+    L += [f"## {BADGE.get(res.verdict, '')} 종합 판정: {res.verdict} (판정 점수 {res.score:.2f}, 확률 아님)", ""]
     L += [f"- {r}" for r in res.reasons]
     L += ["", f"<sub>판정 규칙: {VERDICT_RULES}</sub>", ""]
 
-    L += ["## 가정별 한 줄", "", "| 가정 | 기준 | 기준일 상태·여유 | 최초 경고 | 점검일 상태 | 유형 |", "|---|---|---|---|---|---|"]
+    L += ["## 가정별 한 줄", "", "| 가정 | 기준 | 기준일 상태·여유 | 최초 경고 | 점검일 상태 | 유형 | 점수 |", "|---|---|---|---|---|---|---|"]
     for r in res.rows:
-        L.append(f"| {r.id} {r.statement} | {r.threshold} | {r.at_t0} | {r.first_warning} | {r.now} | {r.failure_type} |")
+        L.append(f"| {r.id} {r.statement} | {r.threshold} | {r.at_t0} | {r.first_warning} | {r.now} | {r.failure_type} | {r.score:.2f} |")
     L.append("")
 
     facts = []

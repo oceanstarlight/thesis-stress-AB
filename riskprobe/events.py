@@ -12,7 +12,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-from riskprobe import text
+from riskprobe import forms, text
 from riskprobe.models import Unknown
 from riskprobe.sources.sec import Filing
 
@@ -81,11 +81,29 @@ def _body(src, f: Filing) -> str:
     return " ".join(parts)[:80_000]
 
 
+def tag_kr(filing: Filing) -> Event:
+    """DART current report: the title rule (sources.dart.EVENT_RULES) gives label and severity."""
+    from riskprobe.sources import dart  # local: dart imports sec, events is imported by both paths
+    tagged = dart.tag_title(filing.title)
+    ev = Event(filing.filing_date, filing)
+    if tagged is None:
+        ev.severity = "skip"
+        return ev
+    ev.labels, ev.severity, ev.matched = [tagged[1]], tagged[2], [filing.title]
+    return ev
+
+
 def scan(src, filings: list[Filing], start: str, end: str) -> tuple[list[Event], list[Unknown]]:
-    """Tagged 8-K events filed in (start, end]. Text is read only for items 7.01 and 8.01."""
+    """Tagged current-report events filed in (start, end]. SEC: text is read only for 8-K items
+    7.01 and 8.01. DART: tagged by title."""
     events, failed = [], []
     for f in filings:
-        if f.form not in ("8-K", "8-K/A") or not (start < f.filing_date <= end):
+        if f.form not in forms.CURRENT or not (start < f.filing_date <= end):
+            continue
+        if not f.form.startswith("8-K"):
+            ev = tag_kr(f)
+            if ev.severity != "skip":
+                events.append(ev)
             continue
         body = ""
         if any(i in (f.items or "") for i in ("7.01", "8.01")):

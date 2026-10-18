@@ -31,7 +31,7 @@ def main() -> int:
     end = a.end or a.t0
     res = lifecycle.run(a.company, a.t0, end, Http(), include_guidance=a.guidance, rate_bp=a.rate_bp, ebitda_pct=a.ebitda_pct)
     md = lifecycle_report.render(res)
-    out = config.ROOT / "reports" / f"review_{a.company.upper()}_{a.t0}_{end}.md"
+    out = config.ROOT / "reports" / f"review_{a.company.upper().replace(':', '-')}_{a.t0}_{end}.md"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(md, encoding="utf-8")
     print(md)

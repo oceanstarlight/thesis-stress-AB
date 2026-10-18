@@ -28,19 +28,22 @@ _FORBIDDEN = re.compile(r"확률|가능성이\s*(?:높|낮)|매수|매도|목표
 GRADE_ORDER = {"초과": 0, "근접": 1, "여유 충분": 2, "": 3}
 
 
-def money(v: float | None) -> str:
+def money(v: float | None, currency: str = "USD") -> str:
     if v is None:
         return "-"
     a = abs(v)
-    s = f"${a / 1e9:,.2f}B" if a >= 1e9 else f"${a / 1e6:,.0f}M"
+    if currency == "KRW":
+        s = f"{a / 1e12:,.2f}조원" if a >= 1e12 else f"{a / 1e8:,.0f}억원"
+    else:
+        s = f"${a / 1e9:,.2f}B" if a >= 1e9 else f"${a / 1e6:,.0f}M"
     return f"-{s}" if v < 0 else s
 
 
 def num(v: float | None, unit: str) -> str:
     if v is None:
         return "-"
-    if unit == "USD":
-        return money(v)
+    if unit in ("USD", "KRW"):
+        return money(v, unit)
     if unit == "x":
         return f"{v:,.2f}배"
     if unit in ("%", "%p"):
@@ -139,11 +142,18 @@ def llm_reading(res: ProbeResult) -> tuple[Reading | None, str]:
     return out, ""
 
 
+# Input-level limits shown on top: the indicators may not describe this company.
+WARN_CODES = ("sec_foreign_filer", "sec_no_periodic", "sec_financial_sector", "dart_financial_sector",
+              "indicator_ebit_basis")
+
+
 def render(res: ProbeResult, use_llm: bool = True) -> str:
     L = [f"# 위험 탐색 보고서: {res.name or res.query}", "",
          f"- 기준일: {res.as_of} (이날까지 공개된 공시만 사용) · 재무 기준 기간 말: {res.anchor or '-'}",
          f"- 연차보고서: {res.filing.form} {res.filing.filing_date} ([원문]({res.filing.url}))" if res.filing else "- 연차보고서: 없음",
          "- 모든 수치는 공시 원문 값으로 코드가 계산했고, 역산 결과는 **조건부 계산(예측 아님)**이다. 확률은 제시하지 않는다.", ""]
+    warned = {u.code: u.message for u in res.unknowns if u.code in WARN_CODES}
+    L += [f"> ⚠️ {m}" for m in warned.values()] + ([""] if warned else [])
 
     L += ["## 1. 한눈에 보는 결론 (코드 판정)", ""]
     L += [f"- {b}" for b in conclusion(res)]

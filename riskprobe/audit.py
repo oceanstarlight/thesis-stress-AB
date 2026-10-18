@@ -24,12 +24,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date
 
-from riskprobe import events, guidance, indicators, pit, quality, reverse
+from riskprobe import events, forms, guidance, indicators, pit, quality, reverse
 from riskprobe.ledger import Assumption, Ledger, StatusEntry
 from riskprobe.models import Unknown
-from riskprobe.sources.sec import Filing, SecSource
+from riskprobe.sources import market
+from riskprobe.sources.sec import Filing
 
-PERIODIC = ("10-Q", "10-K")
+PERIODIC = forms.PERIODIC
 HISTORY_YEARS = 5
 TEMPLATE_FOR = {"interest_coverage": reverse.ebitda_drop_to_coverage, "net_debt_to_ebitda": reverse.ebitda_drop_to_leverage}
 
@@ -147,8 +148,8 @@ def _classify(aa: AssumptionAudit, pre_t0_alerts: list[events.Event]) -> None:
 def run(ledger: Ledger, end: str, http) -> AuditResult:
     t0 = min(a.recorded_at for a in ledger.assumptions) if ledger.assumptions else end
     out = AuditResult(ledger.entity, ledger.name, t0, end)
-    src = SecSource(http)
-    data = src.load(ledger.entity)
+    src = market.source_for(ledger.entity, http)
+    data = src.load(ledger.entity, since=market.since_for(t0))
     out.unknowns += data.unknowns
     if not data.facts:
         return out
